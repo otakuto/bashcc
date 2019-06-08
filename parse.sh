@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source peg.bash
+source peg.sh
 
 function Cexpr()
 {

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-source parse.bash
-source codegen.bash
+source parse.sh
+source codegen.sh
 
 #memo test
 #S <- A
