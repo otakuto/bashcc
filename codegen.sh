@@ -28,6 +28,36 @@ function gen()
     echo 'mov rdx, 0'
     echo 'div rdi'
     echo 'push rax'
+  elif [[ ${h[0]} = 'eq' ]]; then
+    echo 'cmp rax, rdi'
+    echo 'sete al'
+    echo 'movzb rax, al'
+    echo 'push rax'
+  elif [[ ${h[0]} = 'ne' ]]; then
+    echo 'cmp rax, rdi'
+    echo 'setne al'
+    echo 'movzb rax, al'
+    echo 'push rax'
+  elif [[ ${h[0]} = 'lt' ]]; then
+    echo 'cmp rax, rdi'
+    echo 'setl al'
+    echo 'movzb rax, al'
+    echo 'push rax'
+  elif [[ ${h[0]} = 'le' ]]; then
+    echo 'cmp rax, rdi'
+    echo 'setle al'
+    echo 'movzb rax, al'
+    echo 'push rax'
+  elif [[ ${h[0]} = 'gt' ]]; then
+    echo 'cmp rdi, rax'
+    echo 'setl al'
+    echo 'movzb rax, al'
+    echo 'push rax'
+  elif [[ ${h[0]} = 'ge' ]]; then
+    echo 'cmp rdi, rax'
+    echo 'setle al'
+    echo 'movzb rax, al'
+    echo 'push rax'
   fi
 }
 

@@ -102,6 +102,24 @@ function test_func()
   parse Cexpr '-(514*810)'
   assert_eval 0 '(minus (mul (number 514) (number 810)))'
 
+  parse Cexpr '114==514'
+  assert_eval 0 '(eq (number 114) (number 514))'
+
+  parse Cexpr '114!=514'
+  assert_eval 0 '(ne (number 114) (number 514))'
+
+  parse Cexpr '114<514'
+  assert_eval 0 '(lt (number 114) (number 514))'
+
+  parse Cexpr '114<=514'
+  assert_eval 0 '(le (number 114) (number 514))'
+
+  parse Cexpr '114>514'
+  assert_eval 0 '(gt (number 114) (number 514))'
+
+  parse Cexpr '114>=514'
+  assert_eval 0 '(ge (number 114) (number 514))'
+
   #codegen
   parse Cexpr '114514'
   assert_eval 0 '(number 114514)'

@@ -4,7 +4,128 @@ source peg.sh
 
 function Cexpr()
 {
-  add
+  equality
+}
+
+function equality()
+{
+  eval "${MEMO_BEGIN}"
+
+  relational; eval "${M}"
+  local n=${fn_result}
+
+  many equality_0; eval "${M}"
+  local a=(${heap[$fn_result]})
+
+  if [[ ${#a[@]} = 1 ]]; then
+    fn_result=${n}
+    fn_ret=0
+  else
+    local p=${n}
+    for e in ${a[@]:1}; do
+      local e=(${heap[${e}]})
+      heap[$((++heap_count))]="${e[0]} ${p} ${e[1]}"
+      p=${heap_count}
+    done
+    fn_result=${heap_count}
+    fn_ret=0
+  fi
+
+  eval "${MEMO_END}"
+}
+
+function equality_0()
+{
+  local op=
+
+  if try string '=='; then
+    op='eq'
+  elif try string '!='; then
+    op='ne'
+  else
+    fn_result=
+    fn_ret=1
+    return 1
+  fi
+
+  relational; eval "${M}"
+
+  heap[$((++heap_count))]="${op} ${fn_result}"
+  fn_result=${heap_count}
+  fn_ret=0
+  return 0
+}
+
+function relational()
+{
+  eval "${MEMO_BEGIN}"
+
+  add; eval "${M}"
+  local n=${fn_result}
+
+  many relational_0; eval "${M}"
+  local a=(${heap[$fn_result]})
+
+  if [[ ${#a[@]} = 1 ]]; then
+    fn_result=${n}
+    fn_ret=0
+  else
+    local p=${n}
+    for e in ${a[@]:1}; do
+      local e=(${heap[${e}]})
+      heap[$((++heap_count))]="${e[0]} ${p} ${e[1]}"
+      p=${heap_count}
+    done
+    fn_result=${heap_count}
+    fn_ret=0
+  fi
+
+  eval "${MEMO_END}"
+}
+
+function relational_0()
+{
+  local op=
+
+  function lt()
+  {
+    string '<'; eval "${M}"
+    add; eval "${M}"
+  }
+  function le()
+  {
+    string '<='; eval "${M}"
+    add; eval "${M}"
+  }
+  function gt()
+  {
+    string '>'; eval "${M}"
+    add; eval "${M}"
+  }
+  function ge()
+  {
+    string '>='; eval "${M}"
+    add; eval "${M}"
+  }
+
+  if try lt; then
+    op='lt'
+  elif try le; then
+    op='le'
+  elif try gt; then
+    op='gt'
+  elif try ge; then
+    op='ge'
+  else
+    fn_result=
+    fn_ret=1
+    return 1
+  fi
+
+  heap[$((++heap_count))]="${op} ${fn_result}"
+  fn_result=${heap_count}
+  fn_ret=0
+  return 0
 }
 
 function add()
