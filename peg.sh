@@ -75,14 +75,37 @@ function assert_eval()
 }
 
 
-function concat()
+function reverse()
 {
-  local l=${1:5}
-  local a=
-  for e in ${l}; do
-    a="${a}${e}"
+  local n="${1}"
+  heap[$((++heap_count))]='nil'
+  local p="${heap_count}"
+
+  while :; do
+    set -- ${heap[${n}]}
+    if [[ "${1}" = 'pair' ]]; then
+      n=${3}
+      heap[$((++heap_count))]="pair ${2} ${p}"
+      p="${heap_count}"
+    else
+      fn_result="${p}"
+      fn_ret=0
+      return 0
+    fi
   done
-  echo ${a}
+}
+
+function foldl()
+{
+  local f="${1}"
+  local v="${2}"
+  set -- ${heap[${3}]}
+  if [[ "${1}" = "pair" ]]; then
+    v=$(eval "${f} '${v}' ${2}")
+    foldl "${f}" "${v}" "${3}"
+  else
+    echo -n "${v}"
+  fi
 }
 
 function parse()
@@ -106,7 +129,9 @@ function string()
   local s=${text:pos:len}
   if [[ "${s}" = "${str}" ]]; then
     pos=$((pos + len))
-    fn_result=${s}
+    heap[$((++heap_count))]="${s}"
+    heap[$((++heap_count))]="raw ${heap_count}"
+    fn_result="${heap_count}"
     fn_ret=0
     return 0
   else
@@ -118,43 +143,39 @@ function string()
 
 function many()
 {
-  local v=(list)
+  local p="$((++heap_count))"
+  local h="${p}"
 
-  while :
-  do
-    if try ${@}; then
-      v+=(${fn_result})
-    else
-      break
-    fi
+  while try "${@}"; do
+    heap[${p}]="pair ${fn_result} $((++heap_count))"
+    p="${heap_count}"
   done
 
-  heap[$((++heap_count))]=${v[@]}
-  fn_result=${heap_count}
+  heap[${p}]='nil'
+
+  fn_result="${h}"
   fn_ret=0
   return 0
 }
 
 function many1()
 {
-  local v=(list)
+  local p="$((++heap_count))"
+  local h="${p}"
 
-  while :
-  do
-    if try ${@}; then
-      v+=(${fn_result})
-    else
-      break
-    fi
+  while try "${@}"; do
+    heap[${p}]="pair ${fn_result} $((++heap_count))"
+    p="${heap_count}"
   done
 
-  if [[ ${#v[@]} = 1 ]]; then
+  heap[${p}]='nil'
+
+  if [[ "${heap[${h}]}" = 'nil' ]]; then
     fn_result=
     fn_ret=1
     return 1
   else
-    heap[$((++heap_count))]=${v[@]}
-    fn_result=${heap_count}
+    fn_result="${h}"
     fn_ret=0
     return 0
   fi
@@ -194,18 +215,10 @@ function show_ast()
   set -- $1
   if [[ ${1} = 'number' ]]; then
     echo "(${1} ${2})"
-  elif [[ ${1} = 'list' ]]; then
-    shift
-    echo -n '('
-    local count=0
-    for i in "${@}"; do
-      echo -n $(show_ast "${heap[${i}]}")
-      if [[ ${#@} != $(($count + 1)) ]]; then
-        echo -n ' '
-      fi
-      count=$((++count))
-    done
-    echo -n ')'
+  elif [[ ${1} = 'nil' ]]; then
+    echo "nil"
+  elif [[ ${1} = 'raw' ]]; then
+    echo "(raw \"${heap[${2}]}\")"
   else
     echo -n "(${1} "
     shift

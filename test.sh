@@ -60,17 +60,17 @@ function test_func()
   parse 'string "d"' 'abcdefg'
   assert 1 ''
   parse 'try string "123"' '123'
-  assert 0 '123'
+  assert_eval 0 '(raw "123")'
   parse 'try string "1234"' '123'
   assert 1 ''
 
   #digit
   parse digit '0'
-  assert 0 '0'
+  assert_eval 0 '(raw "0")'
   parse digit '1'
-  assert 0 '1'
+  assert_eval 0 '(raw "1")'
   parse digit '9'
-  assert 0 '9'
+  assert_eval 0 '(raw "9")'
 
   #number
   parse number '0123456789'

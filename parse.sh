@@ -12,24 +12,22 @@ function equality()
   eval "${MEMO_BEGIN}"
 
   relational; eval "${M}"
-  local n=${fn_result}
+  local head=${fn_result}
 
   many equality_0; eval "${M}"
-  local a=(${heap[$fn_result]})
+  local tail=${fn_result}
 
-  if [[ ${#a[@]} = 1 ]]; then
-    fn_result=${n}
-    fn_ret=0
-  else
-    local p=${n}
-    for e in ${a[@]:1}; do
-      local e=(${heap[${e}]})
-      heap[$((++heap_count))]="${e[0]} ${p} ${e[1]}"
-      p=${heap_count}
-    done
-    fn_result=${heap_count}
-    fn_ret=0
-  fi
+  local p=${head}
+  local l=${tail}
+  while [[ "${heap[${l}]}" != 'nil' ]]; do
+    local e=(${heap[${l}]})
+    l=${e[2]}
+    e=(${heap[${e[1]}]})
+    heap[$((++heap_count))]="${e[0]} ${p} ${e[1]}"
+    p=${heap_count}
+  done
+  fn_result=${p}
+  fn_ret=0
 
   eval "${MEMO_END}"
 }
@@ -61,24 +59,22 @@ function relational()
   eval "${MEMO_BEGIN}"
 
   add; eval "${M}"
-  local n=${fn_result}
+  local head=${fn_result}
 
   many relational_0; eval "${M}"
-  local a=(${heap[$fn_result]})
+  local tail=${fn_result}
 
-  if [[ ${#a[@]} = 1 ]]; then
-    fn_result=${n}
-    fn_ret=0
-  else
-    local p=${n}
-    for e in ${a[@]:1}; do
-      local e=(${heap[${e}]})
-      heap[$((++heap_count))]="${e[0]} ${p} ${e[1]}"
-      p=${heap_count}
-    done
-    fn_result=${heap_count}
-    fn_ret=0
-  fi
+  local p=${head}
+  local l=${tail}
+  while [[ "${heap[${l}]}" != 'nil' ]]; do
+    local e=(${heap[${l}]})
+    l=${e[2]}
+    e=(${heap[${e[1]}]})
+    heap[$((++heap_count))]="${e[0]} ${p} ${e[1]}"
+    p=${heap_count}
+  done
+  fn_result=${p}
+  fn_ret=0
 
   eval "${MEMO_END}"
 }
@@ -133,24 +129,22 @@ function add()
   eval "${MEMO_BEGIN}"
 
   mul; eval "${M}"
-  local n=${fn_result}
+  local head=${fn_result}
 
   many add_0; eval "${M}"
-  local a=(${heap[$fn_result]})
+  local tail=${fn_result}
 
-  if [[ ${#a[@]} = 1 ]]; then
-    fn_result=${n}
-    fn_ret=0
-  else
-    local p=${n}
-    for e in ${a[@]:1}; do
-      local e=(${heap[${e}]})
-      heap[$((++heap_count))]="${e[0]} ${p} ${e[1]}"
-      p=${heap_count}
-    done
-    fn_result=${heap_count}
-    fn_ret=0
-  fi
+  local p=${head}
+  local l=${tail}
+  while [[ "${heap[${l}]}" != 'nil' ]]; do
+    local e=(${heap[${l}]})
+    l=${e[2]}
+    e=(${heap[${e[1]}]})
+    heap[$((++heap_count))]="${e[0]} ${p} ${e[1]}"
+    p=${heap_count}
+  done
+  fn_result=${p}
+  fn_ret=0
 
   eval "${MEMO_END}"
 }
@@ -182,24 +176,22 @@ function mul()
   eval "${MEMO_BEGIN}"
 
   unary; eval "${M}"
-  local n=${fn_result}
+  local head=${fn_result}
 
   many mul_0; eval "${M}"
-  local a=(${heap[$fn_result]})
+  local tail=${fn_result}
 
-  if [[ ${#a[@]} = 1 ]]; then
-    fn_result=${n}
-    fn_ret=0
-  else
-    local p=${n}
-    for e in ${a[@]:1}; do
-      local e=(${heap[${e}]})
-      heap[$((++heap_count))]="${e[0]} ${p} ${e[1]}"
-      p=${heap_count}
-    done
-    fn_result=${heap_count}
-    fn_ret=0
-  fi
+  local p=${head}
+  local l=${tail}
+  while [[ "${heap[${l}]}" != 'nil' ]]; do
+    local e=(${heap[${l}]})
+    l=${e[2]}
+    e=(${heap[${e[1]}]})
+    heap[$((++heap_count))]="${e[0]} ${p} ${e[1]}"
+    p=${heap_count}
+  done
+  fn_result=${p}
+  fn_ret=0
 
   eval "${MEMO_END}"
 }
@@ -261,12 +253,19 @@ function term()
   eval "${MEMO_END}"
 }
 
+function append()
+{
+  local v="${1}"
+  set -- ${heap[${2}]}
+  echo -n "${v}${heap[${2}]}"
+}
+
 function number()
 {
   eval "${MEMO_BEGIN}"
 
   many1 digit; eval "${M}"
-  local v=$(concat "${heap[$fn_result]}")
+  local v=$(foldl append '' "${fn_result}")
 
   heap[$((++heap_count))]="number ${v}"
   fn_result=${heap_count}
