@@ -95,6 +95,9 @@ function test_func()
   parse Cexpr '114+514+1919+810'
   assert_eval 0 '(add (add (add (number 114) (number 514)) (number 1919)) (number 810))'
 
+  parse Cexpr '-(514*810)'
+  assert_eval 0 '(minus (mul (number 514) (number 810)))'
+
   parse Cexpr '114+514-1919+810'
   assert_eval 0 '(add (sub (add (number 114) (number 514)) (number 1919)) (number 810))'
 

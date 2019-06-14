@@ -107,7 +107,21 @@ function mul_0()
 function unary()
 {
   eval "${MEMO_BEGIN}"
-  term
+
+  local op=
+  if try string '+'; then
+    :
+  elif try string '-'; then
+    op='minus'
+  fi
+
+  term; eval "${M}"
+
+  if [[ -n "${op}" ]]; then
+    heap[$((++heap_count))]="${op} ${fn_result}"
+    fn_result=${heap_count}
+  fi
+
   eval "${MEMO_END}"
 }
 
