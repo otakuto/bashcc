@@ -80,52 +80,49 @@ function test_func()
   parse term '(1234)'
   assert_eval 0 '(number 1234)'
 
-  #Cexpr
-  parse Cexpr '114+514'
+  #expression
+  parse expression '114+514'
   assert_eval 0 '(add (number 114) (number 514))'
 
-  parse Cexpr '114+514-810'
+  parse expression '114+514-810'
   assert_eval 0 '(sub (add (number 114) (number 514)) (number 810))'
 
-  parse Cexpr '114+(514-810)'
+  parse expression '114+(514-810)'
   assert_eval 0 '(add (number 114) (sub (number 514) (number 810)))'
 
-  parse Cexpr '114*514/810'
+  parse expression '114*514/810'
   assert_eval 0 '(div (mul (number 114) (number 514)) (number 810))'
 
-  parse Cexpr '114*(514/810)'
+  parse expression '114*(514/810)'
   assert_eval 0 '(mul (number 114) (div (number 514) (number 810)))'
 
-  parse Cexpr '114+514+1919+810'
-  assert_eval 0 '(add (add (add (number 114) (number 514)) (number 1919)) (number 810))'
-
-  parse Cexpr '-(514*810)'
+  parse expression '-(514*810)'
   assert_eval 0 '(minus (mul (number 514) (number 810)))'
 
-  parse Cexpr '114==514'
+  parse expression '114==514'
   assert_eval 0 '(eq (number 114) (number 514))'
 
-  parse Cexpr '114!=514'
+  parse expression '114!=514'
   assert_eval 0 '(ne (number 114) (number 514))'
 
-  parse Cexpr '114<514'
+  parse expression '114<514'
   assert_eval 0 '(lt (number 114) (number 514))'
 
-  parse Cexpr '114<=514'
+  parse expression '114<=514'
   assert_eval 0 '(le (number 114) (number 514))'
 
-  parse Cexpr '114>514'
+  parse expression '114>514'
   assert_eval 0 '(gt (number 114) (number 514))'
 
-  parse Cexpr '114>=514'
+  parse expression '114>=514'
   assert_eval 0 '(ge (number 114) (number 514))'
 
   #codegen
-  parse Cexpr '114514'
+  parse expression '114514'
   assert_eval 0 '(number 114514)'
   #codegen ${fn_result}
 
-  parse Cexpr '114514*810/1919'
+  parse expression '114514*810/1919'
   codegen ${fn_result} > a.s
   gcc a.s
   ./a.out; echo $?

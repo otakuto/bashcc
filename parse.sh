@@ -2,7 +2,7 @@
 
 source peg.sh
 
-function Cexpr()
+function expression()
 {
   equality
 }
@@ -252,7 +252,7 @@ function term()
   try number; eval "${OR}"
 
   string '('; eval "${M}"
-  Cexpr; eval "${M}"
+  expression; eval "${M}"
   local v=${fn_result}
   string ')'; eval "${M}"
 
