@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source parse.bash
+source codegen.bash
 
 #memo test
 #S <- A
@@ -80,16 +81,19 @@ function test_func()
   assert_eval 0 '(number 1234)'
 
   #Cexpr
-  parse add '114+514-810'
+  parse Cexpr '114+514'
+  assert_eval 0 '(add (number 114) (number 514))'
+
+  parse Cexpr '114+514-810'
   assert_eval 0 '(sub (add (number 114) (number 514)) (number 810))'
 
-  parse add '114+(514-810)'
+  parse Cexpr '114+(514-810)'
   assert_eval 0 '(add (number 114) (sub (number 514) (number 810)))'
 
-  parse mul '114*514/810'
+  parse Cexpr '114*514/810'
   assert_eval 0 '(div (mul (number 114) (number 514)) (number 810))'
 
-  parse mul '114*(514/810)'
+  parse Cexpr '114*(514/810)'
   assert_eval 0 '(mul (number 114) (div (number 514) (number 810)))'
 
   parse Cexpr '114+514+1919+810'
@@ -98,8 +102,15 @@ function test_func()
   parse Cexpr '-(514*810)'
   assert_eval 0 '(minus (mul (number 514) (number 810)))'
 
-  parse Cexpr '114+514-1919+810'
-  assert_eval 0 '(add (sub (add (number 114) (number 514)) (number 1919)) (number 810))'
+  #codegen
+  parse Cexpr '114514'
+  assert_eval 0 '(number 114514)'
+  #codegen ${fn_result}
+
+  parse Cexpr '114514*810/1919'
+  codegen ${fn_result} > a.s
+  gcc a.s
+  ./a.out; echo $?
 
   parse memo_s '((((((((1))))))))'
 }
