@@ -5,7 +5,8 @@ function gen()
   local h=(${heap[${1}]})
 
   if [[ ${h[0]} = 'number' ]]; then
-    echo "push ${h[1]}"
+    local raw=(${heap[${h[1]}]})
+    echo "push ${heap[${raw[1]}]}"
     return 0
   fi
 

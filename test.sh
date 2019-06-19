@@ -74,52 +74,52 @@ function test_func()
 
   #number
   parse number '0123456789'
-  assert_eval 0 '(number 0123456789)'
+  assert_eval 0 '(number (raw "0123456789"))'
 
   #term
   parse term '(1234)'
-  assert_eval 0 '(number 1234)'
+  assert_eval 0 '(number (raw "1234"))'
 
   #expression
   parse expression '114+514'
-  assert_eval 0 '(add (number 114) (number 514))'
+  assert_eval 0 '(add (number (raw "114")) (number (raw "514")))'
 
   parse expression '114+514-810'
-  assert_eval 0 '(sub (add (number 114) (number 514)) (number 810))'
+  assert_eval 0 '(sub (add (number (raw "114")) (number (raw "514"))) (number (raw "810")))'
 
   parse expression '114+(514-810)'
-  assert_eval 0 '(add (number 114) (sub (number 514) (number 810)))'
+  assert_eval 0 '(add (number (raw "114")) (sub (number (raw "514")) (number (raw "810"))))'
 
   parse expression '114*514/810'
-  assert_eval 0 '(div (mul (number 114) (number 514)) (number 810))'
+  assert_eval 0 '(div (mul (number (raw "114")) (number (raw "514"))) (number (raw "810")))'
 
   parse expression '114*(514/810)'
-  assert_eval 0 '(mul (number 114) (div (number 514) (number 810)))'
+  assert_eval 0 '(mul (number (raw "114")) (div (number (raw "514")) (number (raw "810"))))'
 
   parse expression '-(514*810)'
-  assert_eval 0 '(minus (mul (number 514) (number 810)))'
+  assert_eval 0 '(minus (mul (number (raw "514")) (number (raw "810"))))'
 
   parse expression '114==514'
-  assert_eval 0 '(eq (number 114) (number 514))'
+  assert_eval 0 '(eq (number (raw "114")) (number (raw "514")))'
 
   parse expression '114!=514'
-  assert_eval 0 '(ne (number 114) (number 514))'
+  assert_eval 0 '(ne (number (raw "114")) (number (raw "514")))'
 
   parse expression '114<514'
-  assert_eval 0 '(lt (number 114) (number 514))'
+  assert_eval 0 '(lt (number (raw "114")) (number (raw "514")))'
 
   parse expression '114<=514'
-  assert_eval 0 '(le (number 114) (number 514))'
+  assert_eval 0 '(le (number (raw "114")) (number (raw "514")))'
 
   parse expression '114>514'
-  assert_eval 0 '(gt (number 114) (number 514))'
+  assert_eval 0 '(gt (number (raw "114")) (number (raw "514")))'
 
   parse expression '114>=514'
-  assert_eval 0 '(ge (number 114) (number 514))'
+  assert_eval 0 '(ge (number (raw "114")) (number (raw "514")))'
 
   #codegen
   parse expression '114514'
-  assert_eval 0 '(number 114514)'
+  assert_eval 0 '(number (raw "114514"))'
   #codegen ${fn_result}
 
   parse expression '114514*810/1919'

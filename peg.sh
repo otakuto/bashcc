@@ -213,9 +213,7 @@ function print_heap()
 function show_ast()
 {
   set -- $1
-  if [[ ${1} = 'number' ]]; then
-    echo "(${1} ${2})"
-  elif [[ ${1} = 'nil' ]]; then
+  if [[ ${1} = 'nil' ]]; then
     echo "nil"
   elif [[ ${1} = 'raw' ]]; then
     echo "(raw \"${heap[${2}]}\")"

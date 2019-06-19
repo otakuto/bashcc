@@ -267,7 +267,9 @@ function number()
   many1 digit; eval "${M}"
   local v=$(foldl append '' "${fn_result}")
 
-  heap[$((++heap_count))]="number ${v}"
+  heap[$((++heap_count))]="${v}"
+  heap[$((++heap_count))]="raw ${heap_count}"
+  heap[$((++heap_count))]="number ${heap_count}"
   fn_result=${heap_count}
   fn_ret=0
   eval "${MEMO_END}"
