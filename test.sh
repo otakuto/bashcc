@@ -117,6 +117,18 @@ function test_func()
   parse expression '114>=514'
   assert_eval 0 '(ge (number (raw "114")) (number (raw "514")))'
 
+  parse program '114;514;'
+  assert_eval 0 '(pair (number (raw "114")) (pair (number (raw "514")) nil))'
+
+  parse program 'a=19;'
+  assert_eval 0 '(pair (assign (number (raw "19")) (identifier (raw "a"))) nil)'
+
+  parse program '_camel_case;'
+  assert_eval 0 '(pair (identifier (raw "_camel_case")) nil)'
+
+  parse program 'SnakeCase;'
+  assert_eval 0 '(pair (identifier (raw "SnakeCase")) nil)'
+
   #codegen
   parse expression '114514'
   assert_eval 0 '(number (raw "114514"))'

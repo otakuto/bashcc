@@ -2,9 +2,71 @@
 
 source peg.sh
 
+declare -A symbol
+offset=0
+
+function program()
+{
+  eval "${MEMO_BEGIN}"
+
+  many statement; eval "${M}"
+
+  eval "${MEMO_END}"
+}
+
+function statement()
+{
+  eval "${MEMO_BEGIN}"
+
+  expression; eval "${M}"
+  local e=${fn_result}
+  string ';'; eval "${M}"
+
+  fn_result=${e}
+  fn_ret=0
+
+  eval "${MEMO_END}"
+}
+
 function expression()
 {
-  equality
+  eval "${MEMO_BEGIN}"
+
+  assign; eval "${M}"
+
+  eval "${MEMO_END}"
+}
+
+function assign()
+{
+  eval "${MEMO_BEGIN}"
+
+  equality; eval "${M}"
+  local lhs=${fn_result}
+
+  function assign_0()
+  {
+    string '='; eval "${M}"
+    assign; eval "${M}"
+
+    heap[$((++heap_count))]="assign ${fn_result}"
+    fn_result=${heap_count}
+    fn_ret=0
+    return 0
+  }
+
+  if try assign_0; then
+    local rhs=${fn_result}
+    local e=(${heap[${rhs}]})
+    heap[$((++heap_count))]="${e[0]} ${e[1]} ${lhs}"
+    fn_result=${heap_count}
+    fn_ret=0
+  else
+    fn_result=${lhs}
+    fn_ret=0
+  fi
+
+  eval "${MEMO_END}"
 }
 
 function equality()
@@ -243,6 +305,8 @@ function term()
   eval "${MEMO_BEGIN}"
   try number; eval "${OR}"
 
+  try identifier; eval "${OR}"
+
   string '('; eval "${M}"
   expression; eval "${M}"
   local v=${fn_result}
@@ -287,6 +351,52 @@ function digit()
   done
   fn_result=
   fn_ret=1
+  eval "${MEMO_END}"
+}
+
+function identifier()
+{
+  eval "${MEMO_BEGIN}"
+
+  local h
+  local c
+  for c in _ {a..z} {A..Z}; do
+    if try string ${c}; then
+      h=${c}
+      break
+    fi
+  done
+
+  if [[ -z ${h} ]]; then
+    fn_result=
+    fn_ret=1
+    eval "${MEMO_END}"
+  fi
+
+  local s=${c}
+
+  while [[ ! -z ${h} ]]; do
+    h=
+    for c in _ {a..z} {A..Z} {0..9}; do
+      if try string ${c}; then
+        h=${c}
+        s="${s}${h}"
+        break
+      fi
+    done
+  done
+
+  heap[$((++heap_count))]="${s}"
+  heap[$((++heap_count))]="raw ${heap_count}"
+  heap[$((++heap_count))]="identifier ${heap_count}"
+
+  if [[ -z ${symbol[${s}]} ]]; then
+    offset=$((${offset} + 8))
+    symbol[${s}]=${offset}
+  fi
+
+  fn_result=${heap_count}
+  fn_ret=0
   eval "${MEMO_END}"
 }
 
