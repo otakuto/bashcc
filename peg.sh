@@ -10,46 +10,37 @@ fn_ret=
 fn_result=
 
 declare -A memo_table
-MEMO_BEGIN="$(cat << EOL
-  local _pos=\${pos}
-  if [[ -v memo_table[\${pos},\${FUNCNAME}] ]]; then
-    #echo hit
-    #echo \${FUNCNAME}
-    #echo \${pos}
-    #echo \${memo_table[\${pos},\${FUNCNAME}]}
-    #echo
-    set -- \${memo_table[\${pos},\${FUNCNAME}]}
-    pos=\$1
-    fn_ret=\$2
-    fn_result=\$3
-    return \${fn_ret}
-  fi
-EOL
-)"
-MEMO_END="$(cat << EOL
-  memo_table[\${_pos},\${FUNCNAME}]="\${pos} \${fn_ret} \${fn_result}"
-  return \${fn_ret}
-EOL
-)"
+MEMO_BEGIN='eval
+  local _pos=${pos};
+  if [[ -v memo_table[${pos},${FUNCNAME}] ]]; then
+    set -- ${memo_table[${pos},${FUNCNAME}]};
+    pos=$1;
+    fn_ret=$2;
+    fn_result=$3;
+    return ${fn_ret};
+  fi;
+'
+MEMO_END='eval
+  memo_table[${_pos},${FUNCNAME}]="${pos} ${fn_ret} ${fn_result}";
+  return ${fn_ret};
+'
 
-M="$(cat << EOL
-if [[ \${fn_ret} = 1 ]]; then
-  fn_result=
-  fn_ret=1
-  eval "\${MEMO_END}"
-  return 1
-fi
-EOL
-)"
+M='eval
+  if [[ ${fn_ret} = 1 ]]; then
+    fn_result=;
+    fn_ret=1;
+    ${MEMO_END};
+    return 1;
+  fi;
+'
 
-OR="$(cat << EOL
-if [[ \${fn_ret} = 0 ]]; then
-  fn_ret=0
-  eval "\${MEMO_END}"
-  return 0
-fi
-EOL
-)"
+OR='eval
+  if [[ ${fn_ret} = 0 ]]; then
+    fn_ret=0;
+    ${MEMO_END};
+    return 0;
+  fi;
+'
 
 
 function reverse()

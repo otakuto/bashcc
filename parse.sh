@@ -7,47 +7,47 @@ offset=0
 
 function program()
 {
-  eval "${MEMO_BEGIN}"
+  ${MEMO_BEGIN}
 
-  many statement; eval "${M}"
+  many statement; ${M}
 
-  eval "${MEMO_END}"
+  ${MEMO_END}
 }
 
 function statement()
 {
-  eval "${MEMO_BEGIN}"
+  ${MEMO_BEGIN}
 
-  expression; eval "${M}"
+  expression; ${M}
   local e=${fn_result}
-  string ';'; eval "${M}"
+  string ';'; ${M}
 
   fn_result=${e}
   fn_ret=0
 
-  eval "${MEMO_END}"
+  ${MEMO_END}
 }
 
 function expression()
 {
-  eval "${MEMO_BEGIN}"
+  ${MEMO_BEGIN}
 
-  assign; eval "${M}"
+  assign; ${M}
 
-  eval "${MEMO_END}"
+  ${MEMO_END}
 }
 
 function assign()
 {
-  eval "${MEMO_BEGIN}"
+  ${MEMO_BEGIN}
 
-  equality; eval "${M}"
+  equality; ${M}
   local lhs=${fn_result}
 
   function assign_0()
   {
-    string '='; eval "${M}"
-    assign; eval "${M}"
+    string '='; ${M}
+    assign; ${M}
 
     heap[$((++heap_count))]="assign ${fn_result}"
     fn_result=${heap_count}
@@ -66,17 +66,17 @@ function assign()
     fn_ret=0
   fi
 
-  eval "${MEMO_END}"
+  ${MEMO_END}
 }
 
 function equality()
 {
-  eval "${MEMO_BEGIN}"
+  ${MEMO_BEGIN}
 
-  relational; eval "${M}"
+  relational; ${M}
   local head=${fn_result}
 
-  many equality_0; eval "${M}"
+  many equality_0; ${M}
   local tail=${fn_result}
 
   local p=${head}
@@ -91,7 +91,7 @@ function equality()
   fn_result=${p}
   fn_ret=0
 
-  eval "${MEMO_END}"
+  ${MEMO_END}
 }
 
 function equality_0()
@@ -108,7 +108,7 @@ function equality_0()
     return 1
   fi
 
-  relational; eval "${M}"
+  relational; ${M}
 
   heap[$((++heap_count))]="${op} ${fn_result}"
   fn_result=${heap_count}
@@ -118,12 +118,12 @@ function equality_0()
 
 function relational()
 {
-  eval "${MEMO_BEGIN}"
+  ${MEMO_BEGIN}
 
-  add; eval "${M}"
+  add; ${M}
   local head=${fn_result}
 
-  many relational_0; eval "${M}"
+  many relational_0; ${M}
   local tail=${fn_result}
 
   local p=${head}
@@ -138,7 +138,7 @@ function relational()
   fn_result=${p}
   fn_ret=0
 
-  eval "${MEMO_END}"
+  ${MEMO_END}
 }
 
 function relational_0()
@@ -147,23 +147,23 @@ function relational_0()
 
   function lt()
   {
-    string '<'; eval "${M}"
-    add; eval "${M}"
+    string '<'; ${M}
+    add; ${M}
   }
   function le()
   {
-    string '<='; eval "${M}"
-    add; eval "${M}"
+    string '<='; ${M}
+    add; ${M}
   }
   function gt()
   {
-    string '>'; eval "${M}"
-    add; eval "${M}"
+    string '>'; ${M}
+    add; ${M}
   }
   function ge()
   {
-    string '>='; eval "${M}"
-    add; eval "${M}"
+    string '>='; ${M}
+    add; ${M}
   }
 
   if try lt; then
@@ -188,12 +188,12 @@ function relational_0()
 
 function add()
 {
-  eval "${MEMO_BEGIN}"
+  ${MEMO_BEGIN}
 
-  mul; eval "${M}"
+  mul; ${M}
   local head=${fn_result}
 
-  many add_0; eval "${M}"
+  many add_0; ${M}
   local tail=${fn_result}
 
   local p=${head}
@@ -208,7 +208,7 @@ function add()
   fn_result=${p}
   fn_ret=0
 
-  eval "${MEMO_END}"
+  ${MEMO_END}
 }
 
 function add_0()
@@ -225,7 +225,7 @@ function add_0()
     return 1
   fi
 
-  mul; eval "${M}"
+  mul; ${M}
 
   heap[$((++heap_count))]="${t} ${fn_result}"
   fn_result=${heap_count}
@@ -235,12 +235,12 @@ function add_0()
 
 function mul()
 {
-  eval "${MEMO_BEGIN}"
+  ${MEMO_BEGIN}
 
-  unary; eval "${M}"
+  unary; ${M}
   local head=${fn_result}
 
-  many mul_0; eval "${M}"
+  many mul_0; ${M}
   local tail=${fn_result}
 
   local p=${head}
@@ -255,7 +255,7 @@ function mul()
   fn_result=${p}
   fn_ret=0
 
-  eval "${MEMO_END}"
+  ${MEMO_END}
 }
 
 function mul_0()
@@ -272,7 +272,7 @@ function mul_0()
     return 1
   fi
 
-  unary; eval "${M}"
+  unary; ${M}
 
   heap[$((++heap_count))]="${t} ${fn_result}"
   fn_result=${heap_count}
@@ -281,7 +281,7 @@ function mul_0()
 
 function unary()
 {
-  eval "${MEMO_BEGIN}"
+  ${MEMO_BEGIN}
 
   local op=
   if try string '+'; then
@@ -290,31 +290,31 @@ function unary()
     op='minus'
   fi
 
-  term; eval "${M}"
+  term; ${M}
 
   if [[ -n "${op}" ]]; then
     heap[$((++heap_count))]="${op} ${fn_result}"
     fn_result=${heap_count}
   fi
 
-  eval "${MEMO_END}"
+  ${MEMO_END}
 }
 
 function term()
 {
-  eval "${MEMO_BEGIN}"
-  try number; eval "${OR}"
+  ${MEMO_BEGIN}
+  try number; ${OR}
 
-  try identifier; eval "${OR}"
+  try identifier; ${OR}
 
-  string '('; eval "${M}"
-  expression; eval "${M}"
+  string '('; ${M}
+  expression; ${M}
   local v=${fn_result}
-  string ')'; eval "${M}"
+  string ')'; ${M}
 
   fn_result=${v}
   fn_ret=0
-  eval "${MEMO_END}"
+  ${MEMO_END}
 }
 
 function append()
@@ -326,9 +326,9 @@ function append()
 
 function number()
 {
-  eval "${MEMO_BEGIN}"
+  ${MEMO_BEGIN}
 
-  many1 digit; eval "${M}"
+  many1 digit; ${M}
   local v=$(foldl append '' "${fn_result}")
 
   heap[$((++heap_count))]="${v}"
@@ -336,27 +336,27 @@ function number()
   heap[$((++heap_count))]="number ${heap_count}"
   fn_result=${heap_count}
   fn_ret=0
-  eval "${MEMO_END}"
+  ${MEMO_END}
 }
 
 function digit()
 {
-  eval "${MEMO_BEGIN}"
+  ${MEMO_BEGIN}
   local i=
   for i in {0..9}; do
     if try string ${i}; then
       fn_ret=0
-      eval "${MEMO_END}"
+      ${MEMO_END}
     fi
   done
   fn_result=
   fn_ret=1
-  eval "${MEMO_END}"
+  ${MEMO_END}
 }
 
 function identifier()
 {
-  eval "${MEMO_BEGIN}"
+  ${MEMO_BEGIN}
 
   local h
   local c
@@ -370,7 +370,7 @@ function identifier()
   if [[ -z ${h} ]]; then
     fn_result=
     fn_ret=1
-    eval "${MEMO_END}"
+    ${MEMO_END}
   fi
 
   local s=${c}
@@ -397,6 +397,6 @@ function identifier()
 
   fn_result=${heap_count}
   fn_ret=0
-  eval "${MEMO_END}"
+  ${MEMO_END}
 }
 

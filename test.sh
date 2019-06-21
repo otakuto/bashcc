@@ -23,46 +23,46 @@ function assert()
 #P <- "(" A ")" / "1"
 function memo_s()
 {
-  eval "${MEMO_BEGIN}"
+  ${MEMO_BEGIN}
   memo_a
-  eval "${MEMO_END}"
+  ${MEMO_END}
 }
 function memo_a()
 {
-  eval "${MEMO_BEGIN}"
-  try memo_a1; eval "${OR}"
-  try memo_a2; eval "${OR}"
-  memo_p; eval "${M}"
-  eval "${MEMO_END}"
+  ${MEMO_BEGIN}
+  try memo_a1; ${OR}
+  try memo_a2; ${OR}
+  memo_p; ${M}
+  ${MEMO_END}
 }
 function memo_a1()
 {
-  memo_p; eval "${M}"
-  string '+'; eval "${M}"
-  memo_a; eval "${M}"
+  memo_p; ${M}
+  string '+'; ${M}
+  memo_a; ${M}
 }
 function memo_a2()
 {
-  memo_p; eval "${M}"
-  string '-'; eval "${M}"
-  memo_a; eval "${M}"
+  memo_p; ${M}
+  string '-'; ${M}
+  memo_a; ${M}
 }
 function memo_p()
 {
-  eval "${MEMO_BEGIN}"
-  try memo_p1; eval "${OR}"
-  memo_p2; eval "${M}"
-  eval "${MEMO_END}"
+  ${MEMO_BEGIN}
+  try memo_p1; ${OR}
+  memo_p2; ${M}
+  ${MEMO_END}
 }
 function memo_p1()
 {
-  string '('; eval "${M}"
-  memo_a; eval "${M}"
-  string ')'; eval "${M}"
+  string '('; ${M}
+  memo_a; ${M}
+  string ')'; ${M}
 }
 function memo_p2()
 {
-  string '1'; eval "${M}"
+  string '1'; ${M}
   fn_result="1"
 }
 
