@@ -52,29 +52,6 @@ EOL
 )"
 
 
-function assert()
-{
-  if [[ ${fn_ret} != ${1} || ${fn_result[@]} != ${2} ]]; then
-    echo Error
-    echo ret ${1} ${fn_ret}
-    echo result \'${2}\' \'${fn_result[@]}\'
-    echo
-  fi
-}
-
-function assert_eval()
-{
-  ev=$(show_ast "${fn_result}")
-  if [[ ${fn_ret} != ${1} || ${ev} != ${2} ]]; then
-    echo Error
-    echo ${text}
-    echo ret ${1} ${fn_ret}
-    echo result \'${2}\' \'${ev}\'
-    echo
-  fi
-}
-
-
 function reverse()
 {
   local n="${1}"
