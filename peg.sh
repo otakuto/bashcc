@@ -64,7 +64,7 @@ function assert()
 
 function assert_eval()
 {
-  ev=$(show_ast "${heap[${fn_result}]}")
+  ev=$(show_ast "${fn_result}")
   if [[ ${fn_ret} != ${1} || ${ev} != ${2} ]]; then
     echo Error
     echo ${text}
@@ -212,21 +212,16 @@ function print_heap()
 
 function show_ast()
 {
-  set -- $1
-  if [[ ${1} = 'nil' ]]; then
-    echo "nil"
-  elif [[ ${1} = 'raw' ]]; then
-    echo "(raw \"${heap[${2}]}\")"
+  local node=(${heap[${1}]})
+  if [[ ${node[0]} = 'raw' ]]; then
+    echo -n "(raw \"${heap[${node[1]}]}\")"
   else
-    echo -n "(${1} "
-    shift
-    local count=0
-    for i in "${@}"; do
-      echo -n $(show_ast "${heap[${i}]}")
-      if [[ ${#@} != $(($count + 1)) ]]; then
-        echo -n ' '
-      fi
-      count=$((++count))
+    echo -n '('
+    echo -n "${node[0]}"
+    local e=
+    for e in "${node[@]:1}"; do
+      echo -n ' '
+      show_ast "${e}"
     done
     echo -n ')'
   fi
