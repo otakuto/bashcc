@@ -27,11 +27,29 @@ function statement()
 {
   ${MEMO_BEGIN}
 
+  try return_statement; ${OR}
   expression; ${M}
   local e=${fn_result}
   string ';'; ${M}
 
   fn_result=${e}
+  fn_ret=0
+
+  ${MEMO_END}
+}
+
+function return_statement()
+{
+  ${MEMO_BEGIN}
+
+  string 'return'; ${M}
+  skipMany1 space; ${M}
+  expression; ${M}
+  local e=${fn_result}
+  string ';'; ${M}
+
+  heap[$((++heap_count))]="return ${e}"
+  fn_result=${heap_count}
   fn_ret=0
 
   ${MEMO_END}

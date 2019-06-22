@@ -38,6 +38,15 @@ function gen()
     return 0
   fi
 
+  if [[ ${h[0]} = 'return' ]]; then
+    gen "${h[1]}"
+    echo 'pop rax'
+    echo 'mov rsp, rbp'
+    echo 'pop rbp'
+    echo 'ret'
+    return 0
+  fi
+
   if [[ ${h[0]} = 'assign' ]]; then
     gen "${h[1]}"
     gen_lvalue "${h[2]}"

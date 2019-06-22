@@ -170,6 +170,16 @@ function test_func()
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 207 ''
 
+  parse program 'return 114;'
+  assert 'show_ast ${fn_result}' 0 '(pair (return (number (raw "114"))) (nil))'
+  codegen ${fn_result} > a.s
+  assert 'gcc a.s; ./a.out;' 114 ''
+
+  parse program 'abc=2*3;return abc*3;'
+  assert 'show_ast ${fn_result}' 0 '(pair (assign (mul (number (raw "2")) (number (raw "3"))) (identifier (raw "abc"))) (pair (return (mul (identifier (raw "abc")) (number (raw "3")))) (nil)))'
+  codegen ${fn_result} > a.s
+  assert 'gcc a.s; ./a.out;' 18 ''
+
   parse memo_s '((((((((1))))))))'
 }
 
