@@ -1,5 +1,7 @@
 #!/bin/bash
 
+label_count=0
+
 function gen_lvalue()
 {
   local identifier=(${heap[${1}]})
@@ -44,6 +46,20 @@ function gen()
     echo 'mov rsp, rbp'
     echo 'pop rbp'
     echo 'ret'
+    return 0
+  elif [[ ${h[0]} = 'if' ]]; then
+    local begin=$((++label_count))
+    local end=$((++label_count))
+
+    gen "${h[1]}"
+    echo 'pop rax'
+    echo 'cmp rax, 0'
+    echo "je .L${begin}"
+    gen "${h[2]}"
+    echo "jmp .L${end}"
+    echo ".L${begin}:"
+    gen "${h[3]}"
+    echo ".L${end}:"
     return 0
   fi
 
@@ -111,6 +127,7 @@ function gen()
 
 function codegen()
 {
+  label_count=0
   echo '.intel_syntax noprefix'
   echo '.global main'
   echo 'main:'

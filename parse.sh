@@ -28,6 +28,7 @@ function statement()
   ${MEMO_BEGIN}
 
   try return_statement; ${OR}
+  try if_statement; ${OR}
   expression; ${M}
   local e=${fn_result}
   string ';'; ${M}
@@ -51,6 +52,38 @@ function return_statement()
   heap[$((++heap_count))]="return ${e}"
   fn_result=${heap_count}
   fn_ret=0
+
+  ${MEMO_END}
+}
+
+function if_statement()
+{
+  ${MEMO_BEGIN}
+
+  string 'if'; ${M}
+  skipMany space; ${M}
+  string '('; ${M}
+  expression; ${M}
+  local c=${fn_result}
+  string ')'; ${M}
+
+  statement; ${M}
+  local t=${fn_result}
+
+  if try string 'else'; then
+    skipMany1 space; ${M}
+    statement; ${M}
+    local e=${fn_result}
+
+    heap[$((++heap_count))]="if ${c} ${t} ${e}"
+    fn_result=${heap_count}
+    fn_ret=0
+  else
+    heap[$((++heap_count))]='nil'
+    heap[$((++heap_count))]="if ${c} ${t} ${heap_count}"
+    fn_result=${heap_count}
+    fn_ret=0
+  fi
 
   ${MEMO_END}
 }

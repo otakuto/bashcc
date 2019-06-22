@@ -180,6 +180,21 @@ function test_func()
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 18 ''
 
+  parse program 'if (1)a=114;else a=514;return a;'
+  assert 'show_ast ${fn_result}' 0 '(pair (if (number (raw "1")) (assign (number (raw "114")) (identifier (raw "a"))) (assign (number (raw "514")) (identifier (raw "a")))) (pair (return (identifier (raw "a"))) (nil)))'
+  codegen ${fn_result} > a.s
+  assert 'gcc a.s; ./a.out;' 114 ''
+
+  parse program 'if (0)a=114;else a=514;return a;'
+  assert 'show_ast ${fn_result}' 0 '(pair (if (number (raw "0")) (assign (number (raw "114")) (identifier (raw "a"))) (assign (number (raw "514")) (identifier (raw "a")))) (pair (return (identifier (raw "a"))) (nil)))'
+  codegen ${fn_result} > a.s
+  assert 'gcc a.s; ./a.out;' 2 ''
+
+  parse program 'if (1)a=114;if (1)a=514;return a;'
+  assert 'show_ast ${fn_result}' 0 '(pair (if (number (raw "1")) (assign (number (raw "114")) (identifier (raw "a"))) (nil)) (pair (if (number (raw "1")) (assign (number (raw "514")) (identifier (raw "a"))) (nil)) (pair (return (identifier (raw "a"))) (nil))))'
+  codegen ${fn_result} > a.s
+  assert 'gcc a.s; ./a.out;' 2 ''
+
   parse memo_s '((((((((1))))))))'
 }
 
