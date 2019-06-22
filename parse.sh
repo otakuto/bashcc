@@ -5,6 +5,15 @@ source peg.sh
 declare -A symbol
 offset=0
 
+function space()
+{
+  ${MEMO_BEGIN}
+  string ' '; ${OR}
+  string $'\t'; ${OR}
+  string $'\n'; ${M}
+  ${MEMO_END}
+}
+
 function program()
 {
   ${MEMO_BEGIN}

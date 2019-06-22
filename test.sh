@@ -77,6 +77,15 @@ function test_func()
 
   assert "parse 'try string \"1234\"' '123'" 1 ''
 
+  #space
+  assert "parse space 'a'" 1 ''
+  parse space ' '
+  assert 'show_ast ${fn_result}' 0 '(raw " ")'
+  parse space $'\t'
+  assert 'show_ast ${fn_result}' 0 $'(raw "\t")'
+  parse space $'\n'
+  assert 'show_ast ${fn_result}' 0 $'(raw "\n")'
+
   #digit
   parse digit '0'
   assert 'show_ast ${fn_result}' 0 '(raw "0")'
