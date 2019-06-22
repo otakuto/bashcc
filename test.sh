@@ -86,6 +86,14 @@ function test_func()
   parse space $'\n'
   assert 'show_ast ${fn_result}' 0 $'(raw "\n")'
 
+  #skipMany
+  assert "parse 'skipMany space' 'a'" 0 ''
+
+  #skipMany1
+  assert "parse 'skipMany1 space' 'a'" 1 ''
+  assert "parse 'skipMany1 space' '  '" 0 ''
+
+
   #digit
   parse digit '0'
   assert 'show_ast ${fn_result}' 0 '(raw "0")'

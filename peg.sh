@@ -149,6 +149,28 @@ function many1()
   fi
 }
 
+function skipMany()
+{
+  while try "${@}"; do
+    :
+  done
+
+  fn_result=
+  fn_ret=0
+  return 0
+}
+
+function skipMany1()
+{
+  if ! try "${@}"; then
+    fn_result=
+    fn_ret=1
+    return 1
+  fi
+
+  skipMany "${@}"
+}
+
 function try()
 {
   local p=${pos}
