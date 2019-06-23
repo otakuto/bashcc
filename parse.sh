@@ -30,6 +30,7 @@ function statement()
   try return_statement; ${OR}
   try if_statement; ${OR}
   try while_statement; ${OR}
+  try for_statement; ${OR}
   expression; ${M}
   local e=${fn_result}
   string ';'; ${M}
@@ -105,6 +106,54 @@ function while_statement()
   local s=${fn_result}
 
   heap[$((++heap_count))]="while ${cond} ${s}"
+  fn_result=${heap_count}
+  fn_ret=0
+
+  ${MEMO_END}
+}
+
+function for_statement()
+{
+  ${MEMO_BEGIN}
+
+  string 'for'; ${M}
+  skipMany space; ${M}
+  string '('; ${M}
+
+  local init=
+  if try expression; then
+    init=${fn_result}
+  else
+    heap[$((++heap_count))]='nil'
+    init=${heap_count}
+  fi
+
+  string ';'; ${M}
+
+  local cond=
+  if try expression; then
+    cond=${fn_result}
+  else
+    heap[$((++heap_count))]='nil'
+    cond=${heap_count}
+  fi
+
+  string ';'; ${M}
+
+  local iter=
+  if try expression; then
+    iter=${fn_result}
+  else
+    heap[$((++heap_count))]='nil'
+    iter=${heap_count}
+  fi
+
+  string ')'; ${M}
+
+  statement; ${M}
+  local s=${fn_result}
+
+  heap[$((++heap_count))]="for ${init} ${cond} ${iter} ${s}"
   fn_result=${heap_count}
   fn_ret=0
 

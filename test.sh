@@ -200,6 +200,11 @@ function test_func()
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 55 ''
 
+  parse program 's=0;for (i=0;i<=10;i=i+1)s=s+i;return s;'
+  assert 'show_ast ${fn_result}' 0 '(pair (statement (assign (number (raw "0")) (identifier (raw "s")))) (pair (for (assign (number (raw "0")) (identifier (raw "i"))) (le (identifier (raw "i")) (number (raw "10"))) (assign (add (identifier (raw "i")) (number (raw "1"))) (identifier (raw "i"))) (statement (assign (add (identifier (raw "s")) (identifier (raw "i"))) (identifier (raw "s"))))) (pair (return (identifier (raw "s"))) (nil))))'
+  codegen ${fn_result} > a.s
+  assert 'gcc a.s; ./a.out;' 55 ''
+
   parse memo_s '((((((((1))))))))'
 }
 
