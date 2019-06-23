@@ -20,7 +20,6 @@ function gen()
   if [[ ${h[0]} = 'pair' ]]; then
     gen "${h[1]}"
     gen "${h[2]}"
-    echo 'pop rax'
     return 0
   elif [[ ${h[0]} = 'nil' ]]; then
     return 0
@@ -40,7 +39,11 @@ function gen()
     return 0
   fi
 
-  if [[ ${h[0]} = 'return' ]]; then
+  if [[ ${h[0]} = 'statement' ]]; then
+    gen "${h[1]}"
+    echo 'pop rax'
+    return 0
+  elif [[ ${h[0]} = 'return' ]]; then
     gen "${h[1]}"
     echo 'pop rax'
     echo 'mov rsp, rbp'

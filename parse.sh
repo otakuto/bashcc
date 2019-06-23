@@ -33,7 +33,8 @@ function statement()
   local e=${fn_result}
   string ';'; ${M}
 
-  fn_result=${e}
+  heap[$((++heap_count))]="statement ${e}"
+  fn_result=${heap_count}
   fn_ret=0
 
   ${MEMO_END}

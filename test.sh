@@ -148,16 +148,16 @@ function test_func()
   assert 'show_ast ${fn_result}' 0 '(ge (number (raw "114")) (number (raw "514")))'
 
   parse program '114;514;'
-  assert 'show_ast ${fn_result}' 0 '(pair (number (raw "114")) (pair (number (raw "514")) (nil)))'
+  assert 'show_ast ${fn_result}' 0 '(pair (statement (number (raw "114"))) (pair (statement (number (raw "514"))) (nil)))'
 
   parse program 'a=19;'
-  assert 'show_ast ${fn_result}' 0 '(pair (assign (number (raw "19")) (identifier (raw "a"))) (nil))'
+  assert 'show_ast ${fn_result}' 0 '(pair (statement (assign (number (raw "19")) (identifier (raw "a")))) (nil))'
 
   parse program '_camel_case;'
-  assert 'show_ast ${fn_result}' 0 '(pair (identifier (raw "_camel_case")) (nil))'
+  assert 'show_ast ${fn_result}' 0 '(pair (statement (identifier (raw "_camel_case"))) (nil))'
 
   parse program 'SnakeCase;'
-  assert 'show_ast ${fn_result}' 0 '(pair (identifier (raw "SnakeCase")) (nil))'
+  assert 'show_ast ${fn_result}' 0 '(pair (statement (identifier (raw "SnakeCase"))) (nil))'
 
   #codegen
   parse expression '114514'
@@ -176,22 +176,22 @@ function test_func()
   assert 'gcc a.s; ./a.out;' 114 ''
 
   parse program 'abc=2*3;return abc*3;'
-  assert 'show_ast ${fn_result}' 0 '(pair (assign (mul (number (raw "2")) (number (raw "3"))) (identifier (raw "abc"))) (pair (return (mul (identifier (raw "abc")) (number (raw "3")))) (nil)))'
+  assert 'show_ast ${fn_result}' 0 '(pair (statement (assign (mul (number (raw "2")) (number (raw "3"))) (identifier (raw "abc")))) (pair (return (mul (identifier (raw "abc")) (number (raw "3")))) (nil)))'
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 18 ''
 
   parse program 'if (1)a=114;else a=514;return a;'
-  assert 'show_ast ${fn_result}' 0 '(pair (if (number (raw "1")) (assign (number (raw "114")) (identifier (raw "a"))) (assign (number (raw "514")) (identifier (raw "a")))) (pair (return (identifier (raw "a"))) (nil)))'
+  assert 'show_ast ${fn_result}' 0 '(pair (if (number (raw "1")) (statement (assign (number (raw "114")) (identifier (raw "a")))) (statement (assign (number (raw "514")) (identifier (raw "a"))))) (pair (return (identifier (raw "a"))) (nil)))'
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 114 ''
 
   parse program 'if (0)a=114;else a=514;return a;'
-  assert 'show_ast ${fn_result}' 0 '(pair (if (number (raw "0")) (assign (number (raw "114")) (identifier (raw "a"))) (assign (number (raw "514")) (identifier (raw "a")))) (pair (return (identifier (raw "a"))) (nil)))'
+  assert 'show_ast ${fn_result}' 0 '(pair (if (number (raw "0")) (statement (assign (number (raw "114")) (identifier (raw "a")))) (statement (assign (number (raw "514")) (identifier (raw "a"))))) (pair (return (identifier (raw "a"))) (nil)))'
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 2 ''
 
   parse program 'if (1)a=114;if (1)a=514;return a;'
-  assert 'show_ast ${fn_result}' 0 '(pair (if (number (raw "1")) (assign (number (raw "114")) (identifier (raw "a"))) (nil)) (pair (if (number (raw "1")) (assign (number (raw "514")) (identifier (raw "a"))) (nil)) (pair (return (identifier (raw "a"))) (nil))))'
+  assert 'show_ast ${fn_result}' 0 '(pair (if (number (raw "1")) (statement (assign (number (raw "114")) (identifier (raw "a")))) (nil)) (pair (if (number (raw "1")) (statement (assign (number (raw "514")) (identifier (raw "a")))) (nil)) (pair (return (identifier (raw "a"))) (nil))))'
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 2 ''
 
