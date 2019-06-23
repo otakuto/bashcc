@@ -31,6 +31,7 @@ function statement()
   try if_statement; ${OR}
   try while_statement; ${OR}
   try for_statement; ${OR}
+  try block; ${OR}
   expression; ${M}
   local e=${fn_result}
   string ';'; ${M}
@@ -154,6 +155,22 @@ function for_statement()
   local s=${fn_result}
 
   heap[$((++heap_count))]="for ${init} ${cond} ${iter} ${s}"
+  fn_result=${heap_count}
+  fn_ret=0
+
+  ${MEMO_END}
+}
+
+function block()
+{
+  ${MEMO_BEGIN}
+
+  string '{'; ${M}
+  many statement; ${M}
+  local s=${fn_result}
+  string '}'; ${M}
+
+  heap[$((++heap_count))]="block ${s}"
   fn_result=${heap_count}
   fn_ret=0
 
