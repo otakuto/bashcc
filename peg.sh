@@ -128,25 +128,19 @@ function many()
 
 function many1()
 {
-  local p="$((++heap_count))"
-  local h="${p}"
-
-  while try "${@}"; do
-    heap[${p}]="pair ${fn_result} $((++heap_count))"
-    p="${heap_count}"
-  done
-
-  heap[${p}]='nil'
-
-  if [[ "${heap[${h}]}" = 'nil' ]]; then
+  if ! try "${@}"; then
     fn_result=
     fn_ret=1
     return 1
-  else
-    fn_result="${h}"
-    fn_ret=0
-    return 0
   fi
+  local h=${fn_result}
+
+  many "${@}"
+
+  heap[$((++heap_count))]="pair ${h} ${fn_result}"
+  fn_result="${heap_count}"
+  fn_ret=0
+  return 0
 }
 
 function skipMany()
