@@ -29,6 +29,7 @@ function statement()
 
   try return_statement; ${OR}
   try if_statement; ${OR}
+  try while_statement; ${OR}
   expression; ${M}
   local e=${fn_result}
   string ';'; ${M}
@@ -85,6 +86,27 @@ function if_statement()
     fn_result=${heap_count}
     fn_ret=0
   fi
+
+  ${MEMO_END}
+}
+
+function while_statement()
+{
+  ${MEMO_BEGIN}
+
+  string 'while'; ${M}
+  skipMany space; ${M}
+  string '('; ${M}
+  expression; ${M}
+  local cond=${fn_result}
+  string ')'; ${M}
+
+  statement; ${M}
+  local s=${fn_result}
+
+  heap[$((++heap_count))]="while ${cond} ${s}"
+  fn_result=${heap_count}
+  fn_ret=0
 
   ${MEMO_END}
 }

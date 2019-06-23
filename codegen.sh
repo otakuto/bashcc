@@ -64,6 +64,19 @@ function gen()
     gen "${h[3]}"
     echo ".L${end}:"
     return 0
+  elif [[ ${h[0]} = 'while' ]]; then
+    local begin=$((++label_count))
+    local end=$((++label_count))
+
+    echo ".L${begin}:"
+    gen "${h[1]}"
+    echo 'pop rax'
+    echo 'cmp rax, 0'
+    echo "je .L${end}"
+    gen "${h[2]}"
+    echo "jmp .L${begin}"
+    echo ".L${end}:"
+    return 0
   fi
 
   if [[ ${h[0]} = 'assign' ]]; then
