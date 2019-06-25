@@ -165,6 +165,40 @@ function skipMany1()
   skipMany "${@}"
 }
 
+function sepBy()
+{
+  if sepBy1 "${1}" "${2}"; then
+    :
+  else
+    heap[$((++heap_count))]='nil'
+    fn_result=${heap_count}
+    fn_ret=0
+  fi
+
+  return 0
+}
+
+function sepBy1()
+{
+  if ! try "${2}"; then
+    fn_result=
+    fn_ret=1
+    return 1
+  fi
+  local h=${fn_result}
+
+  local f="eval
+    eval ${1}; \${M};
+    eval ${2}; \${M};
+  "
+
+  many "${f}"
+
+  heap[$((++heap_count))]="pair ${h} ${fn_result}"
+  fn_result=${heap_count}
+  fn_ret=0
+}
+
 function try()
 {
   local p=${pos}

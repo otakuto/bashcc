@@ -93,6 +93,16 @@ function test_func()
   assert "parse 'skipMany1 space' 'a'" 1 ''
   assert "parse 'skipMany1 space' '  '" 0 ''
 
+  #sepBy
+  parse "sepBy 'string ,' number" ''
+  assert 'show_ast ${fn_result}' 0 '(nil)'
+  parse "sepBy 'many1 space' number" '1 2  3   4'
+  assert 'show_ast ${fn_result}' 0 '(pair (number (raw "1")) (pair (number (raw "2")) (pair (number (raw "3")) (pair (number (raw "4")) (nil)))))'
+
+  #sepBy1
+  assert 'parse "sepBy1 \"string ,\" number" ""' 1 ''
+  parse "sepBy1 'string ,' number" '1,2,3,4,5'
+  assert 'show_ast ${fn_result}' 0 '(pair (number (raw "1")) (pair (number (raw "2")) (pair (number (raw "3")) (pair (number (raw "4")) (pair (number (raw "5")) (nil))))))'
 
   #digit
   parse digit '0'
