@@ -462,7 +462,8 @@ function term()
       fn_ret=0
       ${MEMO_END}
     else
-      fn_result=${i}
+      heap[$((++heap_count))]="variable ${i}"
+      fn_result=${heap_count}
       fn_ret=0
       ${MEMO_END}
     fi
@@ -564,7 +565,6 @@ function identifier()
 
   heap[$((++heap_count))]="${s}"
   heap[$((++heap_count))]="raw ${heap_count}"
-  heap[$((++heap_count))]="identifier ${heap_count}"
 
   if [[ -z ${symbol[${s}]} ]]; then
     offset=$((${offset} + 8))

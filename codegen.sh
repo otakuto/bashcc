@@ -25,7 +25,7 @@ function gen()
     return 0
   fi
 
-  if [[ ${h[0]} = 'identifier' ]]; then
+  if [[ ${h[0]} = 'variable' ]]; then
     local raw=(${heap[${h[1]}]})
     local offset=${symbol[${heap[${raw[1]}]}]}
     echo 'mov rax, rbp'
@@ -46,8 +46,7 @@ function gen()
     }
     call_walk 0 "${h[2]}"
 
-    local identifier=(${heap[${h[1]}]})
-    local raw=(${heap[${identifier[1]}]})
+    local raw=(${heap[${h[1]}]})
     echo "call ${heap[${raw[1]}]}"
     echo 'push rax'
     return 0
