@@ -220,6 +220,12 @@ function test_func()
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 10 ''
 
+  parse program 'return f();'
+  assert 'show_ast ${fn_result}' 0 '(pair (return (call (identifier (raw "f")) (nil))) (nil))'
+
+  parse program 'return f(1,2,3,4,5,6);'
+  assert 'show_ast ${fn_result}' 0 '(pair (return (call (identifier (raw "f")) (pair (number (raw "1")) (pair (number (raw "2")) (pair (number (raw "3")) (pair (number (raw "4")) (pair (number (raw "5")) (pair (number (raw "6")) (nil))))))))) (nil))'
+
   parse memo_s '((((((((1))))))))'
 }
 

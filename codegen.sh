@@ -33,6 +33,24 @@ function gen()
     echo 'mov rax, [rax]'
     echo 'push rax'
     return 0
+  elif [[ ${h[0]} = 'call' ]]; then
+    function call_walk()
+    {
+      local arg=(${heap[${2}]})
+      if [[ "${arg[0]}" = 'pair' ]]; then
+        gen "${arg[1]}"
+        call_walk $((${1} + 1)) "${arg[2]}"
+        local regs=('rdi' 'rsi' 'rcx' 'rdx' 'r8' 'r9')
+        echo "pop ${regs[${1}]}"
+      fi
+    }
+    call_walk 0 "${h[2]}"
+
+    local identifier=(${heap[${h[1]}]})
+    local raw=(${heap[${identifier[1]}]})
+    echo "call ${heap[${raw[1]}]}"
+    echo 'push rax'
+    return 0
   elif [[ ${h[0]} = 'number' ]]; then
     local raw=(${heap[${h[1]}]})
     echo "push ${heap[${raw[1]}]}"

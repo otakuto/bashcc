@@ -454,7 +454,19 @@ function term()
   ${MEMO_BEGIN}
   try number; ${OR}
 
-  try identifier; ${OR}
+  if try identifier; then
+    local i=${fn_result}
+    if try argument; then
+      heap[$((++heap_count))]="call ${i} ${fn_result}"
+      fn_result=${heap_count}
+      fn_ret=0
+      ${MEMO_END}
+    else
+      fn_result=${i}
+      fn_ret=0
+      ${MEMO_END}
+    fi
+  fi
 
   string '('; ${M}
   expression; ${M}
@@ -463,6 +475,21 @@ function term()
 
   fn_result=${v}
   fn_ret=0
+  ${MEMO_END}
+}
+
+function argument()
+{
+  ${MEMO_BEGIN}
+
+  string '('; ${M}
+  sepBy 'string ,' expression; ${M}
+  local a=${fn_result}
+  string ')'; ${M}
+
+  fn_result=${a}
+  fn_ret=0
+
   ${MEMO_END}
 }
 
