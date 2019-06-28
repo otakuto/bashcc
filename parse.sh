@@ -66,10 +66,8 @@ function if_statement()
 
   string 'if'; ${M}
   skipMany space; ${M}
-  string '('; ${M}
-  expression; ${M}
+  between 'string "("' 'string ")"' expression; ${M}
   local c=${fn_result}
-  string ')'; ${M}
 
   statement; ${M}
   local t=${fn_result}
@@ -98,10 +96,8 @@ function while_statement()
 
   string 'while'; ${M}
   skipMany space; ${M}
-  string '('; ${M}
-  expression; ${M}
+  between 'string "("' 'string ")"' expression; ${M}
   local cond=${fn_result}
-  string ')'; ${M}
 
   statement; ${M}
   local s=${fn_result}
@@ -165,12 +161,8 @@ function block()
 {
   ${MEMO_BEGIN}
 
-  string '{'; ${M}
-  many statement; ${M}
-  local s=${fn_result}
-  string '}'; ${M}
-
-  heap[$((++heap_count))]="block ${s}"
+  between 'string "{"' 'string "}"' 'many statement'; ${M}
+  heap[$((++heap_count))]="block ${fn_result}"
   fn_result=${heap_count}
   fn_ret=0
 
@@ -469,13 +461,8 @@ function term()
     fi
   fi
 
-  string '('; ${M}
-  expression; ${M}
-  local v=${fn_result}
-  string ')'; ${M}
+  between 'string "("' 'string ")"' expression; ${M}
 
-  fn_result=${v}
-  fn_ret=0
   ${MEMO_END}
 }
 
@@ -483,13 +470,7 @@ function argument()
 {
   ${MEMO_BEGIN}
 
-  string '('; ${M}
-  sepBy 'string ,' expression; ${M}
-  local a=${fn_result}
-  string ')'; ${M}
-
-  fn_result=${a}
-  fn_ret=0
+  between 'string "("' 'string ")"' 'sepBy "string ," expression'; ${M}
 
   ${MEMO_END}
 }

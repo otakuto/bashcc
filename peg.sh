@@ -212,6 +212,17 @@ function sepBy1()
   fn_ret=0
 }
 
+function between()
+{
+  eval "${1}"; ${M}
+  eval "${3}"; ${M}
+  local x=${fn_result}
+  eval "${2}"; ${M}
+
+  fn_result=${x}
+  fn_ret=0
+}
+
 function try()
 {
   local p=${pos}

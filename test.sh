@@ -104,6 +104,10 @@ function test_func()
   parse "sepBy1 'string ,' number" '1,2,3,4,5'
   assert 'show_ast ${fn_result}' 0 '(pair (number (raw "1")) (pair (number (raw "2")) (pair (number (raw "3")) (pair (number (raw "4")) (pair (number (raw "5")) (nil))))))'
 
+  #between
+  parse 'between "string \"[\"" "string \"]\"" "string abcd"' '[abcd]'
+  assert 'show_ast ${fn_result}' 0 '(raw "abcd")'
+
   #digit
   parse digit '0'
   assert 'show_ast ${fn_result}' 0 '(raw "0")'
