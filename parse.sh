@@ -18,7 +18,7 @@ function program()
 {
   ${MEMO_BEGIN}
 
-  many statement; ${M}
+  block; ${M}
 
   ${MEMO_END}
 }
@@ -161,8 +161,46 @@ function block()
 {
   ${MEMO_BEGIN}
 
-  between 'string "{"' 'string "}"' 'many statement'; ${M}
+  between 'string "{"' 'string "}"' 'many choice \"try declaration\" \"try statement\"'; ${M}
   heap[$((++heap_count))]="block ${fn_result}"
+  fn_result=${heap_count}
+  fn_ret=0
+
+  ${MEMO_END}
+}
+
+function declaration()
+{
+  ${MEMO_BEGIN}
+
+  declarator; ${M}
+  local d=${fn_result}
+  string ';'; ${M}
+
+  fn_result=${d}
+  fn_ret=0
+
+  ${MEMO_END}
+}
+
+function declarator()
+{
+  ${MEMO_BEGIN}
+
+  string 'int'; ${M}
+  skipMany1 space; ${M}
+  identifier; ${M}
+  local i=${fn_result}
+
+  local raw=(${heap[${i}]})
+  local s=(${heap[${raw[1]}]})
+
+  if [[ -z ${symbol[${s}]} ]]; then
+    offset=$((${offset} + 8))
+    symbol[${s}]=${offset}
+  fi
+
+  heap[$((++heap_count))]="declare ${i}"
   fn_result=${heap_count}
   fn_ret=0
 
@@ -546,11 +584,6 @@ function identifier()
 
   heap[$((++heap_count))]="${s}"
   heap[$((++heap_count))]="raw ${heap_count}"
-
-  if [[ -z ${symbol[${s}]} ]]; then
-    offset=$((${offset} + 8))
-    symbol[${s}]=${offset}
-  fi
 
   fn_result=${heap_count}
   fn_ret=0

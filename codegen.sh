@@ -54,6 +54,8 @@ function gen()
     local raw=(${heap[${h[1]}]})
     echo "push ${heap[${raw[1]}]}"
     return 0
+  elif [[ ${h[0]} = 'declare' ]]; then
+    return 0
   fi
 
   if [[ ${h[0]} = 'statement' ]]; then
