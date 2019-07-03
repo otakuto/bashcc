@@ -68,7 +68,11 @@ function memo_p2()
 
 function test_func()
 {
-  assert "parse 'string \*' '*'" 0 '*'
+  parse 'try string "\*"' '*'
+  assert 'show_ast ${fn_result}' 0 '(raw "*")'
+
+  parse 'try string "\&"' '&'
+  assert 'show_ast ${fn_result}' 0 '(raw "&")'
 
   assert "parse 'string d' 'abcdefg'" 1 ''
 
@@ -194,37 +198,37 @@ function test_func()
   assert 'gcc a.s; ./a.out;' 114 ''
 
   parse program '{int abc;abc=2*3;return abc*3;}'
-  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "abc")) (pair (statement (assign (mul (number (raw "2")) (number (raw "3"))) (variable (raw "abc")))) (pair (return (mul (variable (raw "abc")) (number (raw "3")))) (nil)))))'
+  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "abc") (type (i32) (nil))) (pair (statement (assign (mul (number (raw "2")) (number (raw "3"))) (variable (raw "abc")))) (pair (return (mul (variable (raw "abc")) (number (raw "3")))) (nil)))))'
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 18 ''
 
   parse program '{int a;if (1)a=114;else a=514;return a;}'
-  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "a")) (pair (if (number (raw "1")) (statement (assign (number (raw "114")) (variable (raw "a")))) (statement (assign (number (raw "514")) (variable (raw "a"))))) (pair (return (variable (raw "a"))) (nil)))))'
+  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "a") (type (i32) (nil))) (pair (if (number (raw "1")) (statement (assign (number (raw "114")) (variable (raw "a")))) (statement (assign (number (raw "514")) (variable (raw "a"))))) (pair (return (variable (raw "a"))) (nil)))))'
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 114 ''
 
   parse program '{int a;if (0)a=114;else a=514;return a;}'
-  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "a")) (pair (if (number (raw "0")) (statement (assign (number (raw "114")) (variable (raw "a")))) (statement (assign (number (raw "514")) (variable (raw "a"))))) (pair (return (variable (raw "a"))) (nil)))))'
+  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "a") (type (i32) (nil))) (pair (if (number (raw "0")) (statement (assign (number (raw "114")) (variable (raw "a")))) (statement (assign (number (raw "514")) (variable (raw "a"))))) (pair (return (variable (raw "a"))) (nil)))))'
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 2 ''
 
   parse program '{int a;if (1)a=114;if (1)a=514;return a;}'
-  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "a")) (pair (if (number (raw "1")) (statement (assign (number (raw "114")) (variable (raw "a")))) (nil)) (pair (if (number (raw "1")) (statement (assign (number (raw "514")) (variable (raw "a")))) (nil)) (pair (return (variable (raw "a"))) (nil))))))'
+  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "a") (type (i32) (nil))) (pair (if (number (raw "1")) (statement (assign (number (raw "114")) (variable (raw "a")))) (nil)) (pair (if (number (raw "1")) (statement (assign (number (raw "514")) (variable (raw "a")))) (nil)) (pair (return (variable (raw "a"))) (nil))))))'
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 2 ''
 
   parse program '{int i;int s;i=0;s=0;while (i<10)s=s+(i=i+1);return s;}'
-  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "i")) (pair (declare (raw "s")) (pair (statement (assign (number (raw "0")) (variable (raw "i")))) (pair (statement (assign (number (raw "0")) (variable (raw "s")))) (pair (while (lt (variable (raw "i")) (number (raw "10"))) (statement (assign (add (variable (raw "s")) (assign (add (variable (raw "i")) (number (raw "1"))) (variable (raw "i")))) (variable (raw "s"))))) (pair (return (variable (raw "s"))) (nil))))))))'
+  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "i") (type (i32) (nil))) (pair (declare (raw "s") (type (i32) (nil))) (pair (statement (assign (number (raw "0")) (variable (raw "i")))) (pair (statement (assign (number (raw "0")) (variable (raw "s")))) (pair (while (lt (variable (raw "i")) (number (raw "10"))) (statement (assign (add (variable (raw "s")) (assign (add (variable (raw "i")) (number (raw "1"))) (variable (raw "i")))) (variable (raw "s"))))) (pair (return (variable (raw "s"))) (nil))))))))'
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 55 ''
 
   parse program '{int i;int s;s=0;for (i=0;i<=10;i=i+1)s=s+i;return s;}'
-  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "i")) (pair (declare (raw "s")) (pair (statement (assign (number (raw "0")) (variable (raw "s")))) (pair (for (assign (number (raw "0")) (variable (raw "i"))) (le (variable (raw "i")) (number (raw "10"))) (assign (add (variable (raw "i")) (number (raw "1"))) (variable (raw "i"))) (statement (assign (add (variable (raw "s")) (variable (raw "i"))) (variable (raw "s"))))) (pair (return (variable (raw "s"))) (nil)))))))'
+  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "i") (type (i32) (nil))) (pair (declare (raw "s") (type (i32) (nil))) (pair (statement (assign (number (raw "0")) (variable (raw "s")))) (pair (for (assign (number (raw "0")) (variable (raw "i"))) (le (variable (raw "i")) (number (raw "10"))) (assign (add (variable (raw "i")) (number (raw "1"))) (variable (raw "i"))) (statement (assign (add (variable (raw "s")) (variable (raw "i"))) (variable (raw "s"))))) (pair (return (variable (raw "s"))) (nil)))))))'
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 55 ''
 
   parse program '{int i;int s;for (i=0;i<=10;i=i+1){s=0;s=s+i;}return s;}'
-  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "i")) (pair (declare (raw "s")) (pair (for (assign (number (raw "0")) (variable (raw "i"))) (le (variable (raw "i")) (number (raw "10"))) (assign (add (variable (raw "i")) (number (raw "1"))) (variable (raw "i"))) (block (pair (statement (assign (number (raw "0")) (variable (raw "s")))) (pair (statement (assign (add (variable (raw "s")) (variable (raw "i"))) (variable (raw "s")))) (nil))))) (pair (return (variable (raw "s"))) (nil))))))'
+  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "i") (type (i32) (nil))) (pair (declare (raw "s") (type (i32) (nil))) (pair (for (assign (number (raw "0")) (variable (raw "i"))) (le (variable (raw "i")) (number (raw "10"))) (assign (add (variable (raw "i")) (number (raw "1"))) (variable (raw "i"))) (block (pair (statement (assign (number (raw "0")) (variable (raw "s")))) (pair (statement (assign (add (variable (raw "s")) (variable (raw "i"))) (variable (raw "s")))) (nil))))) (pair (return (variable (raw "s"))) (nil))))))'
   codegen ${fn_result} > a.s
   assert 'gcc a.s; ./a.out;' 10 ''
 
@@ -233,6 +237,11 @@ function test_func()
 
   parse program '{return f(1,2,3,4,5,6);}'
   assert 'show_ast ${fn_result}' 0 '(block (pair (return (call (raw "f") (pair (number (raw "1")) (pair (number (raw "2")) (pair (number (raw "3")) (pair (number (raw "4")) (pair (number (raw "5")) (pair (number (raw "6")) (nil))))))))) (nil)))'
+
+  parse program '{int a;a=3;int*p;p=&a;*p=42;return a;}'
+  assert 'show_ast ${fn_result}' 0 '(block (pair (declare (raw "a") (type (i32) (nil))) (pair (statement (assign (number (raw "3")) (variable (raw "a")))) (pair (declare (raw "p") (type (ptr) (type (i32) (nil)))) (pair (statement (assign (addressof (variable (raw "a"))) (variable (raw "p")))) (pair (statement (assign (number (raw "42")) (dereference (variable (raw "p"))))) (pair (return (variable (raw "a"))) (nil))))))))'
+  codegen ${fn_result} > a.s
+  assert 'gcc a.s; ./a.out;' 42 ''
 
   parse memo_s '((((((((1))))))))'
 }

@@ -187,8 +187,42 @@ function declarator()
 {
   ${MEMO_BEGIN}
 
+  function ptr()
+  {
+    skipMany space; ${M}
+    string '*'; ${M}
+
+    heap[$((++heap_count))]='ptr'
+    fn_result=${heap_count}
+    fn_ret=0
+  }
+
   string 'int'; ${M}
-  skipMany1 space; ${M}
+  heap[$((++heap_count))]='i32'
+  local last=${heap_count}
+
+  local init=
+  if try skipMany1 space; then
+    many ptr; ${M}
+    init=${fn_result}
+  else
+    many1 ptr; ${M}
+    init=${fn_result}
+  fi
+
+  heap[$((++heap_count))]='nil'
+  heap[$((++heap_count))]="type ${last} ${heap_count}"
+
+  local t=${heap_count}
+  reverse ${init}
+  local l=${fn_result}
+  while [[ "${heap[${l}]}" != 'nil' ]]; do
+    local e=(${heap[${l}]})
+    l=${e[2]}
+    heap[$((++heap_count))]="type ${e[1]} ${t}"
+    t=${heap_count}
+  done
+
   identifier; ${M}
   local i=${fn_result}
 
@@ -196,11 +230,16 @@ function declarator()
   local s=(${heap[${raw[1]}]})
 
   if [[ -z ${symbol[${s}]} ]]; then
-    offset=$((${offset} + 8))
-    symbol[${s}]=${offset}
+    local c=(${heap[${t}]})
+    if [[ ${heap[${c[1]}]} = 'ptr' ]]; then
+      offset=$((${offset} + 8))
+    else
+      offset=$((${offset} + 8))
+    fi
+    symbol[${s}]="${offset} ${t}"
   fi
 
-  heap[$((++heap_count))]="declare ${i}"
+  heap[$((++heap_count))]="declare ${i} ${t}"
   fn_result=${heap_count}
   fn_ret=0
 
@@ -467,6 +506,10 @@ function unary()
     :
   elif try string '-'; then
     op='minus'
+  elif try string '\*'; then
+    op='dereference'
+  elif try string '\&'; then
+    op='addressof'
   fi
 
   term; ${M}

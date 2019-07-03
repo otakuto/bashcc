@@ -4,13 +4,19 @@ label_count=0
 
 function gen_lvalue()
 {
-  local identifier=(${heap[${1}]})
-  local raw=(${heap[${identifier[1]}]})
-  local offset=${symbol[${heap[${raw[1]}]}]}
+  local h=(${heap[${1}]})
 
-  echo 'mov rax, rbp'
-  echo "sub rax, ${offset}"
-  echo 'push rax'
+  if [[ ${h[0]} = 'variable' ]]; then
+    local raw=(${heap[${h[1]}]})
+    local s=(${symbol[${heap[${raw[1]}]}]})
+    local offset=${s[0]}
+
+    echo 'mov rax, rbp'
+    echo "sub rax, ${offset}"
+    echo 'push rax'
+  elif [[ ${h[0]} = 'dereference' ]]; then
+    gen "${h[1]}"
+  fi
 }
 
 function gen()
@@ -27,9 +33,16 @@ function gen()
 
   if [[ ${h[0]} = 'variable' ]]; then
     local raw=(${heap[${h[1]}]})
-    local offset=${symbol[${heap[${raw[1]}]}]}
+    local s=(${symbol[${heap[${raw[1]}]}]})
+    local offset=${s[0]}
     echo 'mov rax, rbp'
     echo "sub rax, ${offset}"
+    echo 'mov rax, [rax]'
+    echo 'push rax'
+    return 0
+  elif [[ ${h[0]} = 'dereference' ]]; then
+    gen "${h[1]}"
+    echo 'pop rax'
     echo 'mov rax, [rax]'
     echo 'push rax'
     return 0
@@ -117,6 +130,11 @@ function gen()
 
   if [[ ${h[0]} = 'block' ]]; then
     gen "${h[1]}"
+    return 0
+  fi
+
+  if [[ ${h[0]} = 'addressof' ]]; then
+    gen_lvalue "${h[1]}"
     return 0
   fi
 
