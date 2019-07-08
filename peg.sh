@@ -223,6 +223,19 @@ function between()
   fn_ret=0
 }
 
+function choice()
+{
+  local p=
+  for p in "${@}"; do
+    if eval "${p}"; then
+      return ${fn_ret}
+    fi
+  done
+  fn_result=
+  fn_ret=1
+  return ${fn_ret}
+}
+
 function try()
 {
   local p=${pos}

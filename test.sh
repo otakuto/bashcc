@@ -108,6 +108,10 @@ function test_func()
   parse 'between "string \"[\"" "string \"]\"" "string abcd"' '[abcd]'
   assert 'show_ast ${fn_result}' 0 '(raw "abcd")'
 
+  #choice
+  parse 'many "choice \"string a\" \"string b\""' 'baba'
+  assert 'show_ast ${fn_result}' 0 '(pair (raw "b") (pair (raw "a") (pair (raw "b") (pair (raw "a") (nil)))))'
+
   #digit
   parse digit '0'
   assert 'show_ast ${fn_result}' 0 '(raw "0")'
