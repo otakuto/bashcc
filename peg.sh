@@ -42,6 +42,19 @@ OR='eval
   fi;
 '
 
+function length()
+{
+  local l=0
+  local h=(${heap[${1}]})
+
+  while [[ "${h[0]}" = 'pair' ]]; do
+    h=(${heap[${h[2]}]})
+    l=$((l + 1))
+  done
+
+  fn_result=${l}
+  fn_ret=0
+}
 
 function reverse()
 {
