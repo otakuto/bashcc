@@ -2,8 +2,9 @@
 
 source peg.sh
 
+func_name=
 declare -A symbol
-offset=0
+declare -A offset
 
 function space()
 {
@@ -17,8 +18,53 @@ function space()
 function program()
 {
   ${MEMO_BEGIN}
+  func_name=
+  unset symbol
+  declare -g -A symbol
+  unset offset
+  declare -g -A offset
+
+  many function_definition; ${M}
+
+  ${MEMO_END}
+}
+
+function function_definition()
+{
+  ${MEMO_BEGIN}
+
+  string 'int'; ${M}
+  skipMany1 space; ${M}
+  heap[$((++heap_count))]='i32'
+  local t=${heap_count}
+  heap[$((++heap_count))]='nil'
+  heap[$((++heap_count))]="type ${t} ${heap_count}"
+  local ret=${heap_count}
+
+  identifier; ${M}
+  local i=${fn_result}
+  local raw=(${heap[${i}]})
+  func_name="${heap[${raw[1]}]}"
+  offset[${func_name}]=0
+
+  parameter; ${M}
+  local p=${fn_result}
 
   block; ${M}
+  local b=${fn_result}
+
+  heap[$((++heap_count))]="function ${i} ${p} ${ret} ${b}"
+  fn_result=${heap_count}
+  fn_ret=0
+
+  ${MEMO_END}
+}
+
+function parameter()
+{
+  ${MEMO_BEGIN}
+
+  between 'string "("' 'string ")"' 'sepBy "string ," declarator'; ${M}
 
   ${MEMO_END}
 }
@@ -229,14 +275,14 @@ function declarator()
   local raw=(${heap[${i}]})
   local s=(${heap[${raw[1]}]})
 
-  if [[ -z ${symbol[${s}]} ]]; then
+  if [[ -z ${symbol[${func_name},${s}]} ]]; then
     local c=(${heap[${t}]})
     if [[ ${heap[${c[1]}]} = 'ptr' ]]; then
-      offset=$((${offset} + 8))
+      offset[${func_name}]=$((${offset[${func_name}]} + 8))
     else
-      offset=$((${offset} + 8))
+      offset[${func_name}]=$((${offset[${func_name}]} + 8))
     fi
-    symbol[${s}]="${offset} ${t}"
+    symbol[${func_name},${s}]="${offset[${func_name}]} ${t}"
   fi
 
   heap[$((++heap_count))]="declare ${i} ${t}"

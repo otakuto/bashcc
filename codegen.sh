@@ -8,7 +8,7 @@ function gen_lvalue()
 
   if [[ ${h[0]} = 'variable' ]]; then
     local raw=(${heap[${h[1]}]})
-    local s=(${symbol[${heap[${raw[1]}]}]})
+    local s=(${symbol[${func_name},${heap[${raw[1]}]}]})
     local offset=${s[0]}
 
     echo 'mov rax, rbp'
@@ -33,7 +33,7 @@ function gen()
 
   if [[ ${h[0]} = 'variable' ]]; then
     local raw=(${heap[${h[1]}]})
-    local s=(${symbol[${heap[${raw[1]}]}]})
+    local s=(${symbol[${func_name},${heap[${raw[1]}]}]})
     local offset=${s[0]}
     echo 'mov rax, rbp'
     echo "sub rax, ${offset}"
@@ -128,6 +128,38 @@ function gen()
     return 0
   fi
 
+  if [[ ${h[0]} = 'function' ]]; then
+    local raw=(${heap[${h[1]}]})
+    func_name="${heap[${raw[1]}]}"
+
+    echo "${func_name}:"
+    echo 'push rbp'
+    echo 'mov rbp, rsp'
+    echo "sub rsp, ${offset[${func_name}]}"
+
+    local regs=('rdi' 'rsi' 'rdx' 'rcx' 'r8' 'r9')
+    local param=(${heap[${h[2]}]})
+    local i=0
+    while [[ "${param[0]}" = 'pair' ]]; do
+      local d=(${heap[${param[1]}]})
+      local raw=(${heap[${d[1]}]})
+      local s=(${symbol[${func_name},${heap[${raw[1]}]}]})
+      local offset=${s[0]}
+      echo 'mov rax, rbp'
+      echo "sub rax, ${offset}"
+      echo "mov [rax], ${regs[${i}]}"
+      param=(${heap[${param[2]}]})
+      i=$((++i))
+    done
+
+    gen "${h[4]}"
+    echo 'pop rax'
+    echo 'mov rsp, rbp'
+    echo 'pop rbp'
+    echo 'ret'
+    return 0
+  fi
+
   if [[ ${h[0]} = 'block' ]]; then
     gen "${h[1]}"
     return 0
@@ -205,13 +237,5 @@ function codegen()
   label_count=0
   echo '.intel_syntax noprefix'
   echo '.global main'
-  echo 'main:'
-  echo 'push rbp'
-  echo 'mov rbp, rsp'
-  echo "sub rsp, $offset"
   gen "${1}"
-  echo 'pop rax'
-  echo 'mov rsp, rbp'
-  echo 'pop rbp'
-  echo 'ret'
 }
