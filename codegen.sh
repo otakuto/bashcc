@@ -2,7 +2,7 @@
 
 label_count=0
 
-function gen_lvalue()
+gen_lvalue()
 {
   local h=(${heap[${1}]})
 
@@ -19,7 +19,7 @@ function gen_lvalue()
   fi
 }
 
-function gen()
+gen()
 {
   local h=(${heap[${1}]})
 
@@ -47,7 +47,7 @@ function gen()
     echo 'push rax'
     return 0
   elif [[ ${h[0]} = 'call' ]]; then
-    function call_walk()
+    call_walk()
     {
       local arg=(${heap[${2}]})
       if [[ "${arg[0]}" = 'pair' ]]; then
@@ -232,7 +232,7 @@ function gen()
   fi
 }
 
-function codegen()
+codegen()
 {
   label_count=0
   echo '.intel_syntax noprefix'

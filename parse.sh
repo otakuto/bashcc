@@ -6,7 +6,7 @@ func_name=
 declare -A symbol
 declare -A offset
 
-function space()
+space()
 {
   ${MEMO_BEGIN}
   string ' '; ${OR}
@@ -15,7 +15,7 @@ function space()
   ${MEMO_END}
 }
 
-function program()
+program()
 {
   ${MEMO_BEGIN}
   func_name=
@@ -29,7 +29,7 @@ function program()
   ${MEMO_END}
 }
 
-function function_definition()
+function_definition()
 {
   ${MEMO_BEGIN}
 
@@ -60,7 +60,7 @@ function function_definition()
   ${MEMO_END}
 }
 
-function parameter()
+parameter()
 {
   ${MEMO_BEGIN}
 
@@ -69,7 +69,7 @@ function parameter()
   ${MEMO_END}
 }
 
-function statement()
+statement()
 {
   ${MEMO_BEGIN}
 
@@ -89,7 +89,7 @@ function statement()
   ${MEMO_END}
 }
 
-function return_statement()
+return_statement()
 {
   ${MEMO_BEGIN}
 
@@ -106,7 +106,7 @@ function return_statement()
   ${MEMO_END}
 }
 
-function if_statement()
+if_statement()
 {
   ${MEMO_BEGIN}
 
@@ -136,7 +136,7 @@ function if_statement()
   ${MEMO_END}
 }
 
-function while_statement()
+while_statement()
 {
   ${MEMO_BEGIN}
 
@@ -155,7 +155,7 @@ function while_statement()
   ${MEMO_END}
 }
 
-function for_statement()
+for_statement()
 {
   ${MEMO_BEGIN}
 
@@ -203,7 +203,7 @@ function for_statement()
   ${MEMO_END}
 }
 
-function block()
+block()
 {
   ${MEMO_BEGIN}
 
@@ -215,7 +215,7 @@ function block()
   ${MEMO_END}
 }
 
-function declaration()
+declaration()
 {
   ${MEMO_BEGIN}
 
@@ -229,11 +229,11 @@ function declaration()
   ${MEMO_END}
 }
 
-function declarator()
+declarator()
 {
   ${MEMO_BEGIN}
 
-  function ptr()
+  ptr()
   {
     skipMany space; ${M}
     string '*'; ${M}
@@ -292,7 +292,7 @@ function declarator()
   ${MEMO_END}
 }
 
-function expression()
+expression()
 {
   ${MEMO_BEGIN}
 
@@ -301,14 +301,14 @@ function expression()
   ${MEMO_END}
 }
 
-function assign()
+assign()
 {
   ${MEMO_BEGIN}
 
   equality; ${M}
   local lhs=${fn_result}
 
-  function assign_0()
+  assign_0()
   {
     string '='; ${M}
     assign; ${M}
@@ -333,7 +333,7 @@ function assign()
   ${MEMO_END}
 }
 
-function equality()
+equality()
 {
   ${MEMO_BEGIN}
 
@@ -358,7 +358,7 @@ function equality()
   ${MEMO_END}
 }
 
-function equality_0()
+equality_0()
 {
   local op=
 
@@ -380,7 +380,7 @@ function equality_0()
   return 0
 }
 
-function relational()
+relational()
 {
   ${MEMO_BEGIN}
 
@@ -405,26 +405,26 @@ function relational()
   ${MEMO_END}
 }
 
-function relational_0()
+relational_0()
 {
   local op=
 
-  function lt()
+  lt()
   {
     string '<'; ${M}
     add; ${M}
   }
-  function le()
+  le()
   {
     string '<='; ${M}
     add; ${M}
   }
-  function gt()
+  gt()
   {
     string '>'; ${M}
     add; ${M}
   }
-  function ge()
+  ge()
   {
     string '>='; ${M}
     add; ${M}
@@ -450,7 +450,7 @@ function relational_0()
   return 0
 }
 
-function add()
+add()
 {
   ${MEMO_BEGIN}
 
@@ -475,7 +475,7 @@ function add()
   ${MEMO_END}
 }
 
-function add_0()
+add_0()
 {
   local t=
 
@@ -497,7 +497,7 @@ function add_0()
   return 0
 }
 
-function mul()
+mul()
 {
   ${MEMO_BEGIN}
 
@@ -522,7 +522,7 @@ function mul()
   ${MEMO_END}
 }
 
-function mul_0()
+mul_0()
 {
   local t=
 
@@ -543,7 +543,7 @@ function mul_0()
   fn_ret=0
 }
 
-function unary()
+unary()
 {
   ${MEMO_BEGIN}
 
@@ -568,7 +568,7 @@ function unary()
   ${MEMO_END}
 }
 
-function term()
+term()
 {
   ${MEMO_BEGIN}
   try number; ${OR}
@@ -593,7 +593,7 @@ function term()
   ${MEMO_END}
 }
 
-function argument()
+argument()
 {
   ${MEMO_BEGIN}
 
@@ -602,14 +602,14 @@ function argument()
   ${MEMO_END}
 }
 
-function append()
+append()
 {
   local v="${1}"
   set -- ${heap[${2}]}
   echo -n "${v}${heap[${2}]}"
 }
 
-function number()
+number()
 {
   ${MEMO_BEGIN}
 
@@ -624,7 +624,7 @@ function number()
   ${MEMO_END}
 }
 
-function digit()
+digit()
 {
   ${MEMO_BEGIN}
   local i=
@@ -639,7 +639,7 @@ function digit()
   ${MEMO_END}
 }
 
-function identifier()
+identifier()
 {
   ${MEMO_BEGIN}
 

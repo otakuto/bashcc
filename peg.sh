@@ -42,7 +42,7 @@ OR='eval
   fi;
 '
 
-function length()
+length()
 {
   local l=0
   local h=(${heap[${1}]})
@@ -56,7 +56,7 @@ function length()
   fn_ret=0
 }
 
-function reverse()
+reverse()
 {
   local n="${1}"
   heap[$((++heap_count))]='nil'
@@ -76,7 +76,7 @@ function reverse()
   done
 }
 
-function foldl()
+foldl()
 {
   local f="${1}"
   local v="${2}"
@@ -89,7 +89,7 @@ function foldl()
   fi
 }
 
-function parse()
+parse()
 {
   text="${2}"
   pos=0
@@ -102,7 +102,7 @@ function parse()
   eval ${1}
 }
 
-function string()
+string()
 {
   local str=$1
 
@@ -122,7 +122,7 @@ function string()
   fi
 }
 
-function many()
+many()
 {
   local p="$((++heap_count))"
   local h="${p}"
@@ -139,7 +139,7 @@ function many()
   return 0
 }
 
-function many1()
+many1()
 {
   if ! try "${@}"; then
     fn_result=
@@ -156,7 +156,7 @@ function many1()
   return 0
 }
 
-function skipMany()
+skipMany()
 {
   while try "${@}"; do
     :
@@ -167,7 +167,7 @@ function skipMany()
   return 0
 }
 
-function skipMany1()
+skipMany1()
 {
   if ! try "${@}"; then
     fn_result=
@@ -178,7 +178,7 @@ function skipMany1()
   skipMany "${@}"
 }
 
-function sepBy()
+sepBy()
 {
   if sepBy1 "${1}" "${2}"; then
     :
@@ -191,7 +191,7 @@ function sepBy()
   return 0
 }
 
-function sepBy1()
+sepBy1()
 {
   if ! try "${2}"; then
     fn_result=
@@ -212,7 +212,7 @@ function sepBy1()
   fn_ret=0
 }
 
-function between()
+between()
 {
   eval "${1}"; ${M}
   eval "${3}"; ${M}
@@ -223,7 +223,7 @@ function between()
   fn_ret=0
 }
 
-function choice()
+choice()
 {
   local p=
   for p in "${@}"; do
@@ -236,7 +236,7 @@ function choice()
   return ${fn_ret}
 }
 
-function try()
+try()
 {
   local p=${pos}
   eval ${@}
@@ -247,7 +247,7 @@ function try()
 }
 
 
-function print_memo()
+print_memo()
 {
   echo 'memo_table'
   for k in ${!memo_table[@]}; do
@@ -256,7 +256,7 @@ function print_memo()
   echo
 }
 
-function print_heap()
+print_heap()
 {
   echo 'heap'
   for k in ${!heap[@]}; do
@@ -265,7 +265,7 @@ function print_heap()
   echo
 }
 
-function show_ast()
+show_ast()
 {
   local node=(${heap[${1}]})
   if [[ ${node[0]} = 'raw' ]]; then

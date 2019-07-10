@@ -3,7 +3,7 @@
 source parse.sh
 source codegen.sh
 
-function assert()
+assert()
 {
   local result
   local ret
@@ -21,13 +21,13 @@ function assert()
 #S <- A
 #A <- P "+" A / P "-" A / P
 #P <- "(" A ")" / "1"
-function memo_s()
+memo_s()
 {
   ${MEMO_BEGIN}
   memo_a
   ${MEMO_END}
 }
-function memo_a()
+memo_a()
 {
   ${MEMO_BEGIN}
   try memo_a1; ${OR}
@@ -35,38 +35,38 @@ function memo_a()
   memo_p; ${M}
   ${MEMO_END}
 }
-function memo_a1()
+memo_a1()
 {
   memo_p; ${M}
   string '+'; ${M}
   memo_a; ${M}
 }
-function memo_a2()
+memo_a2()
 {
   memo_p; ${M}
   string '-'; ${M}
   memo_a; ${M}
 }
-function memo_p()
+memo_p()
 {
   ${MEMO_BEGIN}
   try memo_p1; ${OR}
   memo_p2; ${M}
   ${MEMO_END}
 }
-function memo_p1()
+memo_p1()
 {
   string '('; ${M}
   memo_a; ${M}
   string ')'; ${M}
 }
-function memo_p2()
+memo_p2()
 {
   string '1'; ${M}
   fn_result="1"
 }
 
-function test_func()
+test_func()
 {
   parse 'try string "\*"' '*'
   assert 'show_ast ${fn_result}' 0 '(raw "*")'
