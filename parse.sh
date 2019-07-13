@@ -627,15 +627,9 @@ number()
 digit()
 {
   ${MEMO_BEGIN}
-  local i=
-  for i in {0..9}; do
-    if try string ${i}; then
-      fn_ret=0
-      ${MEMO_END}
-    fi
-  done
-  fn_result=
-  fn_ret=1
+
+  oneOf {0..9}; ${M}
+
   ${MEMO_END}
 }
 
