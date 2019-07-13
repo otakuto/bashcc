@@ -637,33 +637,13 @@ identifier()
 {
   ${MEMO_BEGIN}
 
-  local h
-  local c
-  for c in _ {a..z} {A..Z}; do
-    if try string ${c}; then
-      h=${c}
-      break
-    fi
-  done
+  oneOf _ {a..z} {A..Z}; ${M}
+  local h=${fn_result}
+  local raw=(${heap[${h}]})
+  local c=${heap[${raw[1]}]}
 
-  if [[ -z ${h} ]]; then
-    fn_result=
-    fn_ret=1
-    ${MEMO_END}
-  fi
-
-  local s=${c}
-
-  while [[ ! -z ${h} ]]; do
-    h=
-    for c in _ {a..z} {A..Z} {0..9}; do
-      if try string ${c}; then
-        h=${c}
-        s="${s}${h}"
-        break
-      fi
-    done
-  done
+  many oneOf _ {a..z} {A..Z} {0..9}; ${M}
+  local s="$(foldl append "${c}" "${fn_result}")"
 
   heap[$((++heap_count))]="${s}"
   heap[$((++heap_count))]="raw ${heap_count}"
