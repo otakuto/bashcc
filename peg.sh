@@ -42,6 +42,13 @@ OR='eval
   fi;
 '
 
+new()
+{
+  heap[$((++heap_count))]="${1}"
+  fn_result=${heap_count}
+  fn_ret=0
+}
+
 length()
 {
   local l=0
@@ -59,15 +66,15 @@ length()
 reverse()
 {
   local n="${1}"
-  heap[$((++heap_count))]='nil'
-  local p="${heap_count}"
+  new 'nil'
+  local p="${fn_result}"
 
   while :; do
     set -- ${heap[${n}]}
     if [[ "${1}" = 'pair' ]]; then
       n=${3}
-      heap[$((++heap_count))]="pair ${2} ${p}"
-      p="${heap_count}"
+      new "pair ${2} ${p}"
+      p="${fn_result}"
     else
       fn_result="${p}"
       fn_ret=0
@@ -110,11 +117,8 @@ string()
   local s=${text:pos:len}
   if [[ "${s}" = "${str}" ]]; then
     pos=$((pos + len))
-    heap[$((++heap_count))]="${s}"
-    heap[$((++heap_count))]="raw ${heap_count}"
-    fn_result="${heap_count}"
-    fn_ret=0
-    return 0
+    new "${s}"
+    new "raw ${fn_result}"
   else
     fn_result=''
     fn_ret=1
@@ -129,11 +133,9 @@ oneOf()
   for c in "${@}"; do
     if [[ "${h}" = "${c}" ]]; then
       pos=$((pos + 1))
-      heap[$((++heap_count))]="${h}"
-      heap[$((++heap_count))]="raw ${heap_count}"
-      fn_result="${heap_count}"
-      fn_ret=0
-      return 0
+      new "${h}"
+      new "raw ${fn_result}"
+      return ${fn_ret}
     fi
   done
 
@@ -169,11 +171,7 @@ many1()
   local h=${fn_result}
 
   many "${@}"
-
-  heap[$((++heap_count))]="pair ${h} ${fn_result}"
-  fn_result="${heap_count}"
-  fn_ret=0
-  return 0
+  new "pair ${h} ${fn_result}"
 }
 
 skipMany()
@@ -203,9 +201,7 @@ sepBy()
   if sepBy1 "${1}" "${2}"; then
     :
   else
-    heap[$((++heap_count))]='nil'
-    fn_result=${heap_count}
-    fn_ret=0
+    new 'nil'
   fi
 
   return 0
@@ -226,10 +222,7 @@ sepBy1()
   "
 
   many "${f}"
-
-  heap[$((++heap_count))]="pair ${h} ${fn_result}"
-  fn_result=${heap_count}
-  fn_ret=0
+  new "pair ${h} ${fn_result}"
 }
 
 between()

@@ -35,11 +35,11 @@ function_definition()
 
   string 'int'; ${M}
   skipMany1 space; ${M}
-  heap[$((++heap_count))]='i32'
-  local t=${heap_count}
-  heap[$((++heap_count))]='nil'
-  heap[$((++heap_count))]="type ${t} ${heap_count}"
-  local ret=${heap_count}
+  new 'i32'
+  local t=${fn_result}
+  new 'nil'
+  new "type ${t} ${fn_result}"
+  local ret=${fn_result}
 
   identifier; ${M}
   local i=${fn_result}
@@ -53,9 +53,7 @@ function_definition()
   block; ${M}
   local b=${fn_result}
 
-  heap[$((++heap_count))]="function ${i} ${p} ${ret} ${b}"
-  fn_result=${heap_count}
-  fn_ret=0
+  new "function ${i} ${p} ${ret} ${b}"
 
   ${MEMO_END}
 }
@@ -82,9 +80,7 @@ statement()
   local e=${fn_result}
   string ';'; ${M}
 
-  heap[$((++heap_count))]="statement ${e}"
-  fn_result=${heap_count}
-  fn_ret=0
+  new "statement ${e}"
 
   ${MEMO_END}
 }
@@ -99,9 +95,7 @@ return_statement()
   local e=${fn_result}
   string ';'; ${M}
 
-  heap[$((++heap_count))]="return ${e}"
-  fn_result=${heap_count}
-  fn_ret=0
+  new "return ${e}"
 
   ${MEMO_END}
 }
@@ -123,14 +117,10 @@ if_statement()
     statement; ${M}
     local e=${fn_result}
 
-    heap[$((++heap_count))]="if ${c} ${t} ${e}"
-    fn_result=${heap_count}
-    fn_ret=0
+    new "if ${c} ${t} ${e}"
   else
-    heap[$((++heap_count))]='nil'
-    heap[$((++heap_count))]="if ${c} ${t} ${heap_count}"
-    fn_result=${heap_count}
-    fn_ret=0
+    new 'nil'
+    new "if ${c} ${t} ${fn_result}"
   fi
 
   ${MEMO_END}
@@ -148,9 +138,7 @@ while_statement()
   statement; ${M}
   local s=${fn_result}
 
-  heap[$((++heap_count))]="while ${cond} ${s}"
-  fn_result=${heap_count}
-  fn_ret=0
+  new "while ${cond} ${s}"
 
   ${MEMO_END}
 }
@@ -167,8 +155,8 @@ for_statement()
   if try expression; then
     init=${fn_result}
   else
-    heap[$((++heap_count))]='nil'
-    init=${heap_count}
+    new 'nil'
+    init=${fn_result}
   fi
 
   string ';'; ${M}
@@ -177,8 +165,8 @@ for_statement()
   if try expression; then
     cond=${fn_result}
   else
-    heap[$((++heap_count))]='nil'
-    cond=${heap_count}
+    new 'nil'
+    cond=${fn_result}
   fi
 
   string ';'; ${M}
@@ -187,8 +175,8 @@ for_statement()
   if try expression; then
     iter=${fn_result}
   else
-    heap[$((++heap_count))]='nil'
-    iter=${heap_count}
+    new 'nil'
+    iter=${fn_result}
   fi
 
   string ')'; ${M}
@@ -196,9 +184,7 @@ for_statement()
   statement; ${M}
   local s=${fn_result}
 
-  heap[$((++heap_count))]="for ${init} ${cond} ${iter} ${s}"
-  fn_result=${heap_count}
-  fn_ret=0
+  new "for ${init} ${cond} ${iter} ${s}"
 
   ${MEMO_END}
 }
@@ -208,9 +194,7 @@ block()
   ${MEMO_BEGIN}
 
   between 'string "{"' 'string "}"' 'many choice \"try declaration\" \"try statement\"'; ${M}
-  heap[$((++heap_count))]="block ${fn_result}"
-  fn_result=${heap_count}
-  fn_ret=0
+  new "block ${fn_result}"
 
   ${MEMO_END}
 }
@@ -238,14 +222,12 @@ declarator()
     skipMany space; ${M}
     string '*'; ${M}
 
-    heap[$((++heap_count))]='ptr'
-    fn_result=${heap_count}
-    fn_ret=0
+    new 'ptr'
   }
 
   string 'int'; ${M}
-  heap[$((++heap_count))]='i32'
-  local last=${heap_count}
+  new 'i32'
+  local last=${fn_result}
 
   local init=
   if try skipMany1 space; then
@@ -256,17 +238,18 @@ declarator()
     init=${fn_result}
   fi
 
-  heap[$((++heap_count))]='nil'
-  heap[$((++heap_count))]="type ${last} ${heap_count}"
+  new 'nil'
+  new "type ${last} ${fn_result}"
+  local t=${fn_result}
 
-  local t=${heap_count}
   reverse ${init}
   local l=${fn_result}
+
   while [[ "${heap[${l}]}" != 'nil' ]]; do
     local e=(${heap[${l}]})
     l=${e[2]}
-    heap[$((++heap_count))]="type ${e[1]} ${t}"
-    t=${heap_count}
+    new "type ${e[1]} ${t}"
+    t=${fn_result}
   done
 
   identifier; ${M}
@@ -285,9 +268,7 @@ declarator()
     symbol[${func_name},${s}]="${offset[${func_name}]} ${t}"
   fi
 
-  heap[$((++heap_count))]="declare ${i} ${t}"
-  fn_result=${heap_count}
-  fn_ret=0
+  new "declare ${i} ${t}"
 
   ${MEMO_END}
 }
@@ -313,18 +294,13 @@ assign()
     string '='; ${M}
     assign; ${M}
 
-    heap[$((++heap_count))]="assign ${fn_result}"
-    fn_result=${heap_count}
-    fn_ret=0
-    return 0
+    new "assign ${fn_result}"
   }
 
   if try assign_0; then
     local rhs=${fn_result}
     local e=(${heap[${rhs}]})
-    heap[$((++heap_count))]="${e[0]} ${e[1]} ${lhs}"
-    fn_result=${heap_count}
-    fn_ret=0
+    new "${e[0]} ${e[1]} ${lhs}"
   else
     fn_result=${lhs}
     fn_ret=0
@@ -349,8 +325,8 @@ equality()
     local e=(${heap[${l}]})
     l=${e[2]}
     e=(${heap[${e[1]}]})
-    heap[$((++heap_count))]="${e[0]} ${p} ${e[1]}"
-    p=${heap_count}
+    new "${e[0]} ${p} ${e[1]}"
+    p=${fn_result}
   done
   fn_result=${p}
   fn_ret=0
@@ -374,10 +350,7 @@ equality_0()
 
   relational; ${M}
 
-  heap[$((++heap_count))]="${op} ${fn_result}"
-  fn_result=${heap_count}
-  fn_ret=0
-  return 0
+  new "${op} ${fn_result}"
 }
 
 relational()
@@ -396,8 +369,8 @@ relational()
     local e=(${heap[${l}]})
     l=${e[2]}
     e=(${heap[${e[1]}]})
-    heap[$((++heap_count))]="${e[0]} ${p} ${e[1]}"
-    p=${heap_count}
+    new "${e[0]} ${p} ${e[1]}"
+    p=${fn_result}
   done
   fn_result=${p}
   fn_ret=0
@@ -444,10 +417,7 @@ relational_0()
     return 1
   fi
 
-  heap[$((++heap_count))]="${op} ${fn_result}"
-  fn_result=${heap_count}
-  fn_ret=0
-  return 0
+  new "${op} ${fn_result}"
 }
 
 add()
@@ -466,8 +436,8 @@ add()
     local e=(${heap[${l}]})
     l=${e[2]}
     e=(${heap[${e[1]}]})
-    heap[$((++heap_count))]="${e[0]} ${p} ${e[1]}"
-    p=${heap_count}
+    new "${e[0]} ${p} ${e[1]}"
+    p=${fn_result}
   done
   fn_result=${p}
   fn_ret=0
@@ -491,10 +461,7 @@ add_0()
 
   mul; ${M}
 
-  heap[$((++heap_count))]="${t} ${fn_result}"
-  fn_result=${heap_count}
-  fn_ret=0
-  return 0
+  new "${t} ${fn_result}"
 }
 
 mul()
@@ -513,8 +480,8 @@ mul()
     local e=(${heap[${l}]})
     l=${e[2]}
     e=(${heap[${e[1]}]})
-    heap[$((++heap_count))]="${e[0]} ${p} ${e[1]}"
-    p=${heap_count}
+    new "${e[0]} ${p} ${e[1]}"
+    p=${fn_result}
   done
   fn_result=${p}
   fn_ret=0
@@ -538,9 +505,7 @@ mul_0()
 
   unary; ${M}
 
-  heap[$((++heap_count))]="${t} ${fn_result}"
-  fn_result=${heap_count}
-  fn_ret=0
+  new "${t} ${fn_result}"
 }
 
 unary()
@@ -561,8 +526,7 @@ unary()
   term; ${M}
 
   if [[ -n "${op}" ]]; then
-    heap[$((++heap_count))]="${op} ${fn_result}"
-    fn_result=${heap_count}
+    new "${op} ${fn_result}"
   fi
 
   ${MEMO_END}
@@ -576,14 +540,10 @@ term()
   if try identifier; then
     local i=${fn_result}
     if try argument; then
-      heap[$((++heap_count))]="call ${i} ${fn_result}"
-      fn_result=${heap_count}
-      fn_ret=0
+      new "call ${i} ${fn_result}"
       ${MEMO_END}
     else
-      heap[$((++heap_count))]="variable ${i}"
-      fn_result=${heap_count}
-      fn_ret=0
+      new "variable ${i}"
       ${MEMO_END}
     fi
   fi
@@ -616,11 +576,10 @@ number()
   many1 digit; ${M}
   local v=$(foldl append '' "${fn_result}")
 
-  heap[$((++heap_count))]="${v}"
-  heap[$((++heap_count))]="raw ${heap_count}"
-  heap[$((++heap_count))]="number ${heap_count}"
-  fn_result=${heap_count}
-  fn_ret=0
+  new "${v}"
+  new "raw ${fn_result}"
+  new "number ${fn_result}"
+
   ${MEMO_END}
 }
 
@@ -645,11 +604,9 @@ identifier()
   many oneOf _ {a..z} {A..Z} {0..9}; ${M}
   local s="$(foldl append "${c}" "${fn_result}")"
 
-  heap[$((++heap_count))]="${s}"
-  heap[$((++heap_count))]="raw ${heap_count}"
+  new "${s}"
+  new "raw ${fn_result}"
 
-  fn_result=${heap_count}
-  fn_ret=0
   ${MEMO_END}
 }
 
