@@ -81,6 +81,15 @@ test_func()
 
   assert "parse 'try string \"1234\"' '123'" 1 ''
 
+  #oneOf
+  parse 'oneOf {0..9}' '8'
+  assert 'show ${fn_result}' 0 '(raw "8")'
+
+  parse 'many oneOf {0..9}' '114514'
+  assert 'show ${fn_result}' 0 '(pair (raw "1") (pair (raw "1") (pair (raw "4") (pair (raw "5") (pair (raw "1") (pair (raw "4") (nil)))))))'
+
+  assert "parse 'oneOf {a..z}' '1'" 1 ''
+
   #space
   assert "parse space 'a'" 1 ''
   parse space ' '

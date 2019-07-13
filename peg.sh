@@ -122,6 +122,26 @@ string()
   fi
 }
 
+oneOf()
+{
+  local h=${text:pos:1}
+  local c=
+  for c in "${@}"; do
+    if [[ "${h}" = "${c}" ]]; then
+      pos=$((pos + 1))
+      heap[$((++heap_count))]="${h}"
+      heap[$((++heap_count))]="raw ${heap_count}"
+      fn_result="${heap_count}"
+      fn_ret=0
+      return 0
+    fi
+  done
+
+  fn_result=''
+  fn_ret=1
+  return 1
+}
+
 many()
 {
   local p="$((++heap_count))"
