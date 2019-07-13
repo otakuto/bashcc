@@ -265,7 +265,7 @@ print_heap()
   echo
 }
 
-show_ast()
+show()
 {
   local node=(${heap[${1}]})
   if [[ ${node[0]} = 'raw' ]]; then
@@ -276,7 +276,7 @@ show_ast()
     local e=
     for e in "${node[@]:1}"; do
       echo -n ' '
-      show_ast "${e}"
+      show "${e}"
     done
     echo -n ')'
   fi
