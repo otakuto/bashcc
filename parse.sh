@@ -6,6 +6,11 @@ func_name=
 declare -A symbol
 declare -A offset
 
+betweenManySpace()
+{
+  between 'skipMany space' 'skipMany space' ${@}
+}
+
 space()
 {
   ${MEMO_BEGIN}
