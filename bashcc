@@ -1,0 +1,8 @@
+#!/bin/bash
+
+source parse.sh
+source codegen.sh
+
+parse program "$(cat ${1})"
+codegen ${fn_result} > ${1}.s
+gcc ${1}.s
